@@ -1,0 +1,56 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATtiny13A"</DEVICE>
+ <WORKING_DIR>C:\git\Voltage_OSD\VmOSD\VmOSD\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.0.79\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.0.79\avrasm\inc\tn13adef.inc</FILE>
+  <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE>
+  <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\Debug\VmOSD.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>VmOSD.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>VmOSD.map</FILE>
+  <FILE>VmOSD.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <buff><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>32</LINE></buff>
+  <TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>33</LINE></TV_line_start>
+  <RESET><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>51</LINE></RESET>
+  <EXT_INT0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>192</LINE></EXT_INT0>
+  <symbols><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>7</LINE></symbols>
+  <sym0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>8</LINE></sym0>
+  <sym1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>15</LINE></sym1>
+  <sym2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>22</LINE></sym2>
+  <sym3><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>29</LINE></sym3>
+  <sym4><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>36</LINE></sym4>
+  <sym5><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>43</LINE></sym5>
+  <sym6><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>50</LINE></sym6>
+  <sym7><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>57</LINE></sym7>
+  <sym8><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>64</LINE></sym8>
+  <sym9><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>71</LINE></sym9>
+  <symdot><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>78</LINE></symdot>
+  <symspc><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>85</LINE></symspc>
+  <stop_timer><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc</FILE><LINE>9</LINE></stop_timer>
+  <start_timer><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc</FILE><LINE>14</LINE></start_timer>
+  <PrintCharLine><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>122</LINE></PrintCharLine>
+  <conv_num_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>159</LINE></conv_num_bcd>
+  <conv_d_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>176</LINE></conv_d_bcd>
+  <clear0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>168</LINE></clear0>
+  <Lbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>178</LINE></Lbcd>
+  <exitbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>183</LINE></exitbcd>
+  <vsout_newpage><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>233</LINE></vsout_newpage>
+  <pcint_stop_tmr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>226</LINE></pcint_stop_tmr>
+  <pcint_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>228</LINE></pcint_exit>
+ </LABELS>
+</ASSEMBLER_INFO>
