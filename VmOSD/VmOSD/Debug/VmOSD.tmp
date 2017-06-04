@@ -24,10 +24,13 @@
   <FILE>VmOSD.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <buff><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>32</LINE></buff>
-  <TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>33</LINE></TV_line_start>
-  <RESET><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>51</LINE></RESET>
-  <EXT_INT0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>192</LINE></EXT_INT0>
+  <buff_addr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>34</LINE></buff_addr>
+  <buff_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>35</LINE></buff_data>
+  <TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>36</LINE></TV_line_start>
+  <TV_col_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>37</LINE></TV_col_start>
+  <RESET><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>57</LINE></RESET>
+  <EXT_INT0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>221</LINE></EXT_INT0>
+  <TIM0_COMPA><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>273</LINE></TIM0_COMPA>
   <symbols><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>7</LINE></symbols>
   <sym0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>8</LINE></sym0>
   <sym1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>15</LINE></sym1>
@@ -43,14 +46,21 @@
   <symspc><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>85</LINE></symspc>
   <stop_timer><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc</FILE><LINE>9</LINE></stop_timer>
   <start_timer><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc</FILE><LINE>14</LINE></start_timer>
-  <PrintCharLine><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>122</LINE></PrintCharLine>
-  <conv_num_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>159</LINE></conv_num_bcd>
-  <conv_d_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>176</LINE></conv_d_bcd>
-  <clear0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>168</LINE></clear0>
-  <Lbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>178</LINE></Lbcd>
-  <exitbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>183</LINE></exitbcd>
-  <vsout_newpage><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>233</LINE></vsout_newpage>
-  <pcint_stop_tmr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>226</LINE></pcint_stop_tmr>
-  <pcint_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>228</LINE></pcint_exit>
+  <main_loop><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>102</LINE></main_loop>
+  <PrintCharLine><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>106</LINE></PrintCharLine>
+  <fill_num_buff_addr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>144</LINE></fill_num_buff_addr>
+  <conv_d_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>168</LINE></conv_d_bcd>
+  <clear0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>157</LINE></clear0>
+  <conv_bcd_to_address><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>180</LINE></conv_bcd_to_address>
+  <exitbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>167</LINE></exitbcd>
+  <Lbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>170</LINE></Lbcd>
+  <mult1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>185</LINE></mult1>
+  <fill_num_buff_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>198</LINE></fill_num_buff_data>
+  <cpybuff><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>206</LINE></cpybuff>
+  <vsout_newpage><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>262</LINE></vsout_newpage>
+  <pcint_stop_tmr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>255</LINE></pcint_stop_tmr>
+  <pcint_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>257</LINE></pcint_exit>
+  <tmrcpl1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>282</LINE></tmrcpl1>
+  <tmrcpl2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>287</LINE></tmrcpl2>
  </LABELS>
 </ASSEMBLER_INFO>

@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Sun Jun 04 12:04:26 2017
+AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Sun Jun 04 19:36:31 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -293,7 +293,8 @@ EQU  WDTaddr      00000008
 EQU  ADCCaddr     00000009
 EQU  INT_VECTORS_SIZE 0000000a
 EQU  FIRST_PRINT_TV_LINE 0000010e
-EQU  sym_height   0000000c
+EQU  FIRST_PRINT_TV_COLUMN 0000000a
+EQU  SYM_HEIGHT   0000000c
 EQU  VSOUT_PIN    00000002
 EQU  HSOUT_PIN    00000001
 EQU  CONF_PIN     00000000
@@ -305,17 +306,21 @@ DEF  r_sreg       r2
 DEF  bcd          r3
 DEF  tmp          r16
 DEF  tmp1         r17
+DEF  tmp2         r4
 DEF  itmp         r18
 DEF  itmp1        r19
 DEF  itmp2        r5
 DEF  sym_line_nr  r20
 DEF  voltage      r21
-DEF  TV_lineH     r4
+DEF  TV_lineH     r6
 DEF  TV_lineL     r22
-DSEG buff         00000060
-DSEG TV_line_start 00000064
+DSEG buff_addr    00000060
+DSEG buff_data    00000064
+DSEG TV_line_start 00000068
+DSEG TV_col_start 0000006a
 CSEG RESET        0000005a
-CSEG EXT_INT0     000000b7
+CSEG EXT_INT0     000000c6
+CSEG TIM0_COMPA   000000e2
 CSEG symbols      0000000a
 CSEG sym0         0000000a
 CSEG sym1         00000010
@@ -331,12 +336,19 @@ CSEG symdot       00000046
 CSEG symspc       0000004c
 CSEG stop_timer   00000052
 CSEG start_timer  00000054
-CSEG PrintCharLine 00000086
-CSEG conv_num_bcd 0000009d
-CSEG conv_d_bcd   000000b0
-CSEG clear0       000000a7
-CSEG Lbcd         000000b1
-CSEG exitbcd      000000b6
-CSEG vsout_newpage 000000ce
-CSEG pcint_stop_tmr 000000cb
-CSEG pcint_exit   000000cc
+CSEG main_loop    00000079
+CSEG PrintCharLine 0000007a
+CSEG fill_num_buff_addr 00000091
+CSEG conv_d_bcd   000000a8
+CSEG clear0       0000009d
+CSEG conv_bcd_to_address 000000ae
+CSEG exitbcd      000000a7
+CSEG Lbcd         000000a9
+CSEG mult1        000000b2
+CSEG fill_num_buff_data 000000b9
+CSEG cpybuff      000000bf
+CSEG vsout_newpage 000000dd
+CSEG pcint_stop_tmr 000000da
+CSEG pcint_exit   000000db
+CSEG tmrcpl1      000000e6
+CSEG tmrcpl2      000000ea

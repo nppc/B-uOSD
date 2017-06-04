@@ -5,7 +5,7 @@
  *   Author: Pavel
  */ 
 
-; this routines are called from interrupts, so use interrupt registers
+; these routines are called from interrupts, so use interrupt registers
 stop_timer:
 		; actually we only disable interrupt
 		out	TIMSK0, z0
