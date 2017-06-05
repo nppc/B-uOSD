@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Sun Jun 04 19:36:31 2017
+AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Mon Jun 05 21:01:00 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -292,8 +292,10 @@ EQU  OC0Baddr     00000007
 EQU  WDTaddr      00000008
 EQU  ADCCaddr     00000009
 EQU  INT_VECTORS_SIZE 0000000a
+EQU  CRYSTAL_FREQ 00927c00
 EQU  FIRST_PRINT_TV_LINE 0000010e
 EQU  FIRST_PRINT_TV_COLUMN 0000000a
+EQU  VOLT_DIV_CONST 000000ba
 EQU  SYM_HEIGHT   0000000c
 EQU  VSOUT_PIN    00000002
 EQU  HSOUT_PIN    00000001
@@ -314,13 +316,16 @@ DEF  sym_line_nr  r20
 DEF  voltage      r21
 DEF  TV_lineH     r6
 DEF  TV_lineL     r22
+DEF  adc_cntr     r7
+DEF  adc_sumL     r8
+DEF  adc_sumH     r9
 DSEG buff_addr    00000060
 DSEG buff_data    00000064
 DSEG TV_line_start 00000068
 DSEG TV_col_start 0000006a
-CSEG RESET        0000005a
-CSEG EXT_INT0     000000c6
-CSEG TIM0_COMPA   000000e2
+CSEG RESET        00000114
+CSEG EXT_INT0     000000c1
+CSEG TIM0_COMPA   000000dd
 CSEG symbols      0000000a
 CSEG sym0         0000000a
 CSEG sym1         00000010
@@ -336,19 +341,39 @@ CSEG symdot       00000046
 CSEG symspc       0000004c
 CSEG stop_timer   00000052
 CSEG start_timer  00000054
-CSEG main_loop    00000079
-CSEG PrintCharLine 0000007a
-CSEG fill_num_buff_addr 00000091
-CSEG conv_d_bcd   000000a8
-CSEG clear0       0000009d
-CSEG conv_bcd_to_address 000000ae
-CSEG exitbcd      000000a7
-CSEG Lbcd         000000a9
-CSEG mult1        000000b2
-CSEG fill_num_buff_data 000000b9
-CSEG cpybuff      000000bf
-CSEG vsout_newpage 000000dd
-CSEG pcint_stop_tmr 000000da
-CSEG pcint_exit   000000db
-CSEG tmrcpl1      000000e6
-CSEG tmrcpl2      000000ea
+CSEG ReadVoltage  0000005a
+CSEG adc_exit     00000074
+CSEG adc_L1       00000068
+CSEG adc_3        0000006f
+CSEG adc_4        00000073
+CSEG PrintCharLine 00000075
+CSEG fill_num_buff_addr 0000008c
+CSEG conv_d_bcd   000000a3
+CSEG clear0       00000098
+CSEG conv_bcd_to_address 000000a9
+CSEG exitbcd      000000a2
+CSEG Lbcd         000000a4
+CSEG mult1        000000ad
+CSEG fill_num_buff_data 000000b4
+CSEG cpybuff      000000ba
+CSEG vsout_newpage 000000d8
+CSEG pcint_stop_tmr 000000d5
+CSEG pcint_exit   000000d6
+CSEG tmrcpl1      000000e1
+CSEG tmrcpl2      000000e5
+EQU  BAUD         00004b00
+EQU  DELAY_C      000001f4
+EQU  DELAY_COUNT  0000004f
+CSEG UART_get_byte 000000ec
+CSEG uart_wait_for_start 000000ee
+CSEG UART_delay   000000fc
+CSEG uart_get_bit 000000f1
+CSEG uart_bit_done 000000fa
+CSEG UART_delay1  000000fd
+CSEG EnterCommandMode 00000100
+CSEG SA_Wait_Transfer_Compelted 0000010b
+CSEG SA_LB        00000104
+CSEG SA_Exit      00000109
+CSEG SA_L1        0000010b
+CSEG SA_L2        0000010d
+CSEG main_loop    00000139

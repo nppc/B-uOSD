@@ -46,7 +46,6 @@ TV_line_start:	.BYTE 2	; Line number where we start print data (from EEPROM)
 TV_col_start:	.BYTE 1	; Column number where to start print data (from EEPROM). 
 						; 10 equals about 3us.
 						; useful range about 1-100
-BAUD_DELAY: 	.BYTE 1	; Baud delay that used in delay loop of software UART
 
 
 .CSEG
@@ -140,7 +139,7 @@ main_loop:
 		
 		; Do we need to enter Configure mode?
 		sbis PINB, CONF_PIN
-		rcall SerialActivity
+		rcall EnterCommandMode
 		
 		rjmp main_loop				
 		

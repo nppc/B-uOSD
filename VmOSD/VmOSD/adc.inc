@@ -20,7 +20,7 @@ ReadVoltage:
 		adc adc_sumH, tmp1
 		inc adc_cntr
 		; check adc_cntr. Did we collected all data?
-		ldi, tmp, 64
+		ldi tmp, 64
 		cp adc_cntr, tmp
 		brlo adc_exit	; continue to accumulate ADC readings
 		; data is ready for converting
