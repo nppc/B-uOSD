@@ -1,7 +1,7 @@
 /*
  * font.inc
  *
- *  Created: 03-Jun-17 11:01:40 PM
+ *  Created: 03-Jun-17 
  *   Author: Pavel
  */ 
 symbols:

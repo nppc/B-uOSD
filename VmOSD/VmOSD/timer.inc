@@ -1,7 +1,7 @@
 /*
  * timer.inc
  *
- *  Created: 04-Jun-17 11:00:27 AM
+ *  Created: 04-Jun-17 
  *   Author: Pavel
  */ 
 
