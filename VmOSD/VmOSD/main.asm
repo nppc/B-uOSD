@@ -46,6 +46,7 @@ TV_line_start:	.BYTE 2	; Line number where we start print data (from EEPROM)
 TV_col_start:	.BYTE 1	; Column number where to start print data (from EEPROM). 
 						; 10 equals about 3us.
 						; useful range about 1-100
+Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings
 
 
 .CSEG
