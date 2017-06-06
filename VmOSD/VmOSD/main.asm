@@ -4,8 +4,8 @@
 ; PAL visible lines - 576
 
 
-.EQU	FIRST_PRINT_TV_LINE 	= 270	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 10	; Line where we start to print
+.EQU	FIRST_PRINT_TV_LINE 	= 450	; Line where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 20	; Line where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
@@ -128,15 +128,30 @@ RESET:
 		ldi tmp, 1<<VBAT_PIN
 		out DIDR0, tmp
 		
+		ldi voltage, 126	; for debug
+/*
+		rcall fill_num_buff_addr
+		clr sym_line_nr
+		rcall fill_num_buff_data
+		inc sym_line_nr
+		rcall fill_num_buff_data
+		inc sym_line_nr
+		rcall fill_num_buff_data
+		inc sym_line_nr
+		rcall fill_num_buff_data
+		inc sym_line_nr
+		rcall fill_num_buff_data
+		inc sym_line_nr
+		rcall fill_num_buff_data
+*/
 		sei ; Enable interrupts
 
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
-		ldi voltage, 126	; for debug
 
 		; read ADSC bit to see if conversion finished
-		sbis ADCSRA, ADSC
-		rcall ReadVoltage
+		;sbis ADCSRA, ADSC
+		;rcall ReadVoltage
 		
 		; Do we need to enter Configure mode?
 		sbis PINB, CONF_PIN

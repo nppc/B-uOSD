@@ -1,18 +1,18 @@
 
-AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Mon Jun 05 21:01:00 2017
+AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Tue Jun 06 21:38:24 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.0.79\avrasm\inc\tn13adef.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(64): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(65): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(66): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(67): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(65): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(66): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(67): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(69): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.0.79\avrasm\inc\tn13adef.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(64): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(65): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(66): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(67): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc'
-C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(65): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(66): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\timer.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(67): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc'
+C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(69): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc'
                                  
                                  ; at 9.6mhz, 10 cycles = 1us
                                  
@@ -499,8 +499,8 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  ; PAL visible lines - 576
                                  
                                  
-                                 .EQU	FIRST_PRINT_TV_LINE 	= 270	; Line where we start to print
-                                 .EQU	FIRST_PRINT_TV_COLUMN 	= 10	; Line where we start to print
+                                 .EQU	FIRST_PRINT_TV_LINE 	= 450	; Line where we start to print
+                                 .EQU	FIRST_PRINT_TV_COLUMN 	= 20	; Line where we start to print
                                  .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
                                  										; Vmax=(15+1)*1.1/1=17.6
                                  										; 4095/(17.6*10)*8=186
@@ -541,17 +541,18 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
 00006a                           TV_col_start:	.BYTE 1	; Column number where to start print data (from EEPROM). 
                                  						; 10 equals about 3us.
                                  						; useful range about 1-100
+00006b                           Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings
                                  
                                  
                                  .CSEG
                                  .ORG 0
-000000 c113                      		rjmp RESET ; Reset Handler
-000001 c0bf                      		rjmp EXT_INT0 ; IRQ0 Handler
+000000 c151                      		rjmp RESET ; Reset Handler
+000001 c0a5                      		rjmp EXT_INT0 ; IRQ0 Handler
 000002 9518                      		reti	;rjmp PCINT_int ; PCINT0 Handler
 000003 9518                      		reti	;rjmp TIM0_OVF ; Timer0 Overflow Handler
 000004 9518                      		reti	;rjmp EE_RDY ; EEPROM Ready Handler
 000005 9518                      		reti	;rjmp ANA_COMP ; Analog Comparator Handler
-000006 c0d6                      		rjmp TIM0_COMPA ; Timer0 CompareA Handler
+000006 c0bc                      		rjmp TIM0_COMPA ; Timer0 CompareA Handler
 000007 9518                      		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
 000008 9518                      		reti	;rjmp WATCHDOG ; Watchdog Interrupt Handler
 000009 9518                      		reti	;rjmp ADC ; ADC Conversion Handler
@@ -578,14 +579,14 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
 000014 f820                      		.DB 0b00100000, 0b11111000
 000015 00f8                      		.DB 0b11111000, 0
                                  		
-000016 6060                      sym2:	.DB 0b01100000, 0b01100000
+000016 60e0                      sym2:	.DB 0b11100000, 0b01100000
 000017 20e0                      		.DB 0b11100000, 0b00100000
 000018 2020                      		.DB 0b00100000, 0b00100000
 000019 2020                      		.DB 0b00100000, 0b00100000
 00001a f820                      		.DB 0b00100000, 0b11111000
 00001b 00f8                      		.DB 0b11111000, 0
                                  
-00001c 60e0                      sym3:	.DB 0b11100000, 0b01100000
+00001c 6020                      sym3:	.DB 0b00100000, 0b01100000
 00001d 20e0                      		.DB 0b11100000, 0b00100000
 00001e 2020                      		.DB 0b00100000, 0b00100000
 00001f 2020                      		.DB 0b00100000, 0b00100000
@@ -606,14 +607,14 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
 00002c f820                      		.DB 0b00100000, 0b11111000
 00002d 00f8                      		.DB 0b11111000, 0
                                  
-00002e 603c                      sym6:	.DB 0b00111100, 0b01100000
-00002f 20e0                      		.DB 0b11100000, 0b00100000
-000030 2020                      		.DB 0b00100000, 0b00100000
-000031 2020                      		.DB 0b00100000, 0b00100000
-000032 f820                      		.DB 0b00100000, 0b11111000
-000033 00f8                      		.DB 0b11111000, 0
+00002e 0804                      sym6:	.DB 0b00000100, 0b00001000
+00002f 2010                      		.DB 0b00010000, 0b00100000
+000030 8040                      		.DB 0b01000000, 0b10000000
+000031 0804                      		.DB 0b00000100, 0b00001000
+000032 2010                      		.DB 0b00010000, 0b00100000
+000033 8040                      		.DB 0b01000000, 0b10000000
                                  
-000034 6020                      sym7:	.DB 0b00100000, 0b01100000
+000034 0804                      sym7:	.DB 0b00000100, 0b00001000
 000035 20e0                      		.DB 0b11100000, 0b00100000
 000036 2020                      		.DB 0b00100000, 0b00100000
 000037 2020                      		.DB 0b00100000, 0b00100000
@@ -638,8 +639,8 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
 000047 0000                      		.DB 0b00000000, 0b00000000
 000048 0000                      		.DB 0b00000000, 0b00000000
 000049 0000                      		.DB 0b00000000, 0b00000000
-00004a 8080                      		.DB 0b10000000, 0b10000000
-00004b 0080                      		.DB 0b10000000, 0
+00004a c0c0                      		.DB 0b11000000, 0b11000000
+00004b 00c0                      		.DB 0b11000000, 0
                                  
 00004c 0000
 00004d 0000
@@ -656,22 +657,22 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                   */ 
                                  
                                  ; these routines are called from interrupts, so use interrupt registers
-                                 stop_timer:
+                                 ;stop_timer:
                                  		; actually we only disable interrupt
-000052 be09                      		out	TIMSK0, z0
-000053 9508                      		ret
+                                 ;		out	TIMSK0, z0
+                                 ;		ret
                                  
                                  start_timer:
-000054 be02                      		out TCNT0, z0		; reset counter
-000055 e024                      		ldi itmp, 1<<OCF0A	; reset interrupt flag
-000056 bf28                      		out TIFR0, itmp
-000057 e024                      		ldi itmp, 1<<OCIE0A	; enable Compare Match interrupt
-000058 bf29                      		out	TIMSK0, itmp
+000052 be02                      		out TCNT0, z0		; reset counter
+000053 e024                      		ldi itmp, 1<<OCF0A	; reset interrupt flag
+000054 bf28                      		out TIFR0, itmp
+000055 e024                      		ldi itmp, 1<<OCIE0A	; enable Compare Match interrupt
+000056 bf29                      		out	TIMSK0, itmp
                                  		; we don't need to reset prescaller, because we use no prescaller :)
                                  
                                  		
                                  .include "adc.inc"
-000059 9508                      
+000057 9508                      
                                   * adc.inc
                                   *
                                   *  Created: 04-Jun-17
@@ -685,42 +686,42 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  ; At the end we will convert ADC value to volts (actually volts*10 for easy printing)
                                  ReadVoltage:
                                  		; read current ADC
-00005a b104                      		in tmp, ADCL
-00005b b115                      		in tmp1, ADCH
-00005c 9a36                      		sbi ADCSRA, ADSC		; start new conversion
+000058 b104                      		in tmp, ADCL
+000059 b115                      		in tmp1, ADCH
+00005a 9a36                      		sbi ADCSRA, ADSC		; start new conversion
                                  		; accumulate readings
-00005d 0e80                      		add adc_sumL, tmp
-00005e 1e91                      		adc adc_sumH, tmp1
-00005f 9473                      		inc adc_cntr
+00005b 0e80                      		add adc_sumL, tmp
+00005c 1e91                      		adc adc_sumH, tmp1
+00005d 9473                      		inc adc_cntr
                                  		; check adc_cntr. Did we collected all data?
-000060 e400                      		ldi tmp, 64
-000061 1670                      		cp adc_cntr, tmp
-000062 f088                      		brlo adc_exit	; continue to accumulate ADC readings
+00005e e400                      		ldi tmp, 64
+00005f 1670                      		cp adc_cntr, tmp
+000060 f088                      		brlo adc_exit	; continue to accumulate ADC readings
                                  		; data is ready for converting
-000063 2477                      		clr adc_cntr	; reset counter
+000061 2477                      		clr adc_cntr	; reset counter
                                  		; Oversamping the result(divide by 16)
                                  		; But actually we divide only by 2, to preserve precision in integer math
-000064 9496                      		lsr adc_sumH
-000065 9487                      		ror adc_sumL
+000062 9496                      		lsr adc_sumH
+000063 9487                      		ror adc_sumL
                                  		; Now we use constant VOLT_DIV_CONST.
                                  		; And to get voltage (Vin*10) we divide ADC Oversampled value by our calculated constant 
-000066 eb0a                      		ldi tmp, VOLT_DIV_CONST
-000067 2444                      		clr tmp2	; result will be here
-000068 1680                      adc_L1:	cp adc_sumL, tmp
-000069 0490                      		cpc adc_sumH, z0
-00006a f020                      		brlo adc_3
-00006b 9443                      		inc tmp2
-00006c 1a80                      		sub adc_sumL, tmp
-00006d 0890                      		sbc	adc_sumH, z0
-00006e cff9                      		rjmp adc_L1
+000064 eb0a                      		ldi tmp, VOLT_DIV_CONST
+000065 2444                      		clr tmp2	; result will be here
+000066 1680                      adc_L1:	cp adc_sumL, tmp
+000067 0490                      		cpc adc_sumH, z0
+000068 f020                      		brlo adc_3
+000069 9443                      		inc tmp2
+00006a 1a80                      		sub adc_sumL, tmp
+00006b 0890                      		sbc	adc_sumH, z0
+00006c cff9                      		rjmp adc_L1
                                  adc_3:	; now we have reminder in adc_sumL. Lets add it to the final result
-00006f 9506                      		lsr tmp	; divide constant by 2
-000070 1680                      		cp adc_sumL, tmp
-000071 f008                      		brlo adc_4
-000072 9443                      		inc tmp2	; add 1 (actually it is 0.1) to the result if reminder is 0.5 or greather
-000073 2d54                      adc_4:	mov voltage, tmp2	; now we have beautiful result for printing
+00006d 9506                      		lsr tmp	; divide constant by 2
+00006e 1680                      		cp adc_sumL, tmp
+00006f f008                      		brlo adc_4
+000070 9443                      		inc tmp2	; add 1 (actually it is 0.1) to the result if reminder is 0.5 or greather
+000071 2d54                      adc_4:	mov voltage, tmp2	; now we have beautiful result for printing
                                  adc_exit:
-000074 9508                      		ret
+000072 9508                      		ret
                                  .include "tvout.inc"
                                  
                                   * tvout.inc
@@ -729,40 +730,6 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                   *   Author: Pavel
                                   */ 
                                  
-                                 ; this routine is called from interrupts, so use interrupt registers
-                                 ; print one char line (about 3us)		
-                                 PrintCharLine:
-                                 ; itmp has bits for line of symbol
-000075 2455                      	clr itmp2
-                                 
-000076 fb20                      	bst itmp,0				;1
-000077 f854                      	bld itmp2,VIDEO_PIN		;1 
-000078 ba58                      	out PortB, itmp2		;1
-                                 
-000079 fb21                      	bst itmp,1				;1
-00007a f854                      	bld itmp2,VIDEO_PIN		;1 
-00007b ba58                      	out PortB, itmp2		;1
-                                 
-00007c fb22                      	bst itmp,2				;1
-00007d f854                      	bld itmp2,VIDEO_PIN		;1 
-00007e ba58                      	out PortB, itmp2		;1
-                                 
-00007f fb23                      	bst itmp,3				;1
-000080 f854                      	bld itmp2,VIDEO_PIN		;1 
-000081 ba58                      	out PortB, itmp2		;1
-                                 
-000082 fb24                      	bst itmp,4				;1
-000083 f854                      	bld itmp2,VIDEO_PIN		;1 
-000084 ba58                      	out PortB, itmp2		;1
-                                 
-000085 fb25                      	bst itmp,5				;1
-000086 f854                      	bld itmp2,VIDEO_PIN		;1 
-000087 ba58                      	out PortB, itmp2		;1
-                                 
-000088 0000                      	nop						;1
-000089 0000                      	nop						;1
-00008a ba08                      	out PortB,z0			;1 (clear last bit if was set)
-00008b 9508                      	ret
                                  	
                                  
                                  
@@ -770,53 +737,53 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  ; this routine is called from interrupts, so use interrupt registers
                                  ; voltage is input parameter	
                                  fill_num_buff_addr:
-00008c 27ff                      		clr ZH
-00008d e6e0                      		ldi ZL, low(buff_addr)
-00008e e928                      		ldi itmp, low(symspc << 1)		; space
-00008f 8320                      		st Z, itmp
-000090 2f25                      		mov itmp, voltage	; number to convert
-000091 e634                      		ldi itmp1, 100
-000092 d010                      		rcall conv_d_bcd
-000093 1430                      		cp bcd, z0	;	remove leading zero
-000094 f019                      		breq clear0
-000095 2c53                      		mov itmp2, bcd
-000096 d012                      		rcall conv_bcd_to_address
-000097 9251                      		st Z+, itmp2
-000098 e03a                      clear0:	ldi itmp1, 10
-000099 d009                      		rcall conv_d_bcd
-00009a 2c53                      		mov itmp2, bcd
-00009b d00d                      		rcall conv_bcd_to_address
-00009c 9251                      		st Z+, itmp2
-00009d e83c                      		ldi itmp1, low(symdot << 1)
-00009e 9331                      		st Z+, itmp1
-00009f 2e52                      		mov itmp2, itmp
-0000a0 d008                      		rcall conv_bcd_to_address
-0000a1 8250                      		st Z, itmp2
-0000a2 9508                      exitbcd:ret
+000073 27ff                      		clr ZH
+000074 e6e0                      		ldi ZL, low(buff_addr)
+000075 e928                      		ldi itmp, low(symspc << 1)		; space
+000076 8320                      		st Z, itmp
+000077 2f25                      		mov itmp, voltage	; number to convert
+000078 e634                      		ldi itmp1, 100
+000079 d010                      		rcall conv_d_bcd
+00007a 1430                      		cp bcd, z0	;	remove leading zero
+00007b f019                      		breq clear0
+00007c 2c53                      		mov itmp2, bcd
+00007d d012                      		rcall conv_bcd_to_address
+00007e 9251                      		st Z+, itmp2
+00007f e03a                      clear0:	ldi itmp1, 10
+000080 d009                      		rcall conv_d_bcd
+000081 2c53                      		mov itmp2, bcd
+000082 d00d                      		rcall conv_bcd_to_address
+000083 9251                      		st Z+, itmp2
+000084 e83c                      		ldi itmp1, low(symdot << 1)
+000085 9331                      		st Z+, itmp1
+000086 2e52                      		mov itmp2, itmp
+000087 d008                      		rcall conv_bcd_to_address
+000088 8250                      		st Z, itmp2
+000089 9508                      exitbcd:ret
                                  conv_d_bcd:
-0000a3 2433                      		clr bcd
-0000a4 1723                      Lbcd:	cp itmp, itmp1
-0000a5 f3e0                      		brlo exitbcd
-0000a6 9433                      		inc bcd
-0000a7 1b23                      		sub itmp, itmp1
-0000a8 cffb                      		rjmp Lbcd
+00008a 2433                      		clr bcd
+00008b 1723                      Lbcd:	cp itmp, itmp1
+00008c f3e0                      		brlo exitbcd
+00008d 9433                      		inc bcd
+00008e 1b23                      		sub itmp, itmp1
+00008f cffb                      		rjmp Lbcd
                                  
                                  
                                  ; this routine is called from interrupts, so use interrupt registers
                                  ; tmp2 contains bcd number
                                  ; Convert Char number to address
                                  conv_bcd_to_address:		
-0000a9 932f                      		push itmp
-0000aa 933f                      		push itmp1
-0000ab e134                      		ldi itmp1, low(symbols << 1)	; we need only low address byte, because fonts are at the beginning of the flash
-0000ac e02c                      		ldi itmp, SYM_HEIGHT
-0000ad 0d35                      mult1:	add itmp1, itmp2
-0000ae 952a                      		dec	itmp
-0000af f7e9                      		brne mult1
-0000b0 2e53                      		mov itmp2, itmp1	; return value
-0000b1 913f                      		pop itmp1
-0000b2 912f                      		pop itmp
-0000b3 9508                      		ret
+000090 932f                      		push itmp
+000091 933f                      		push itmp1
+000092 e134                      		ldi itmp1, low(symbols << 1)	; we need only low address byte, because fonts are at the beginning of the flash
+000093 e02c                      		ldi itmp, SYM_HEIGHT
+000094 0f32                      mult1:	add itmp1, itmp
+000095 945a                      		dec	itmp2
+000096 f7e9                      		brne mult1
+000097 2e53                      		mov itmp2, itmp1	; return value
+000098 913f                      		pop itmp1
+000099 912f                      		pop itmp
+00009a 9508                      		ret
                                  		
                                  
                                  ; this routine is called from interrupts, so use interrupt registers
@@ -825,20 +792,19 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  ; buff_addr contains addresses of every printed char
                                  fill_num_buff_data:
                                  		; so, we just need to add sym_line _nr to the address and read data from flash to sram
-0000b4 e6a0                      		ldi	XL, low(buff_addr)
-0000b5 27bb                      		clr XH
-0000b6 e6c4                      		ldi YL, low(buff_data)
-0000b7 27dd                      		clr YH
-0000b8 27ff                      		clr ZH
-0000b9 e034                      		ldi itmp1, 4	; bytes to copy
-0000ba 91ed                      cpybuff:ld ZL, X+
-0000bb 0fe4                      		add ZL, sym_line_nr		; go to current line in char bitmap
-0000bc 9124                      		lpm	itmp, Z
-0000bd 9329                      		st Y+, itmp
-0000be 953a                      		dec itmp1
-0000bf f7d1                      		brne cpybuff
-                                 		;inc sym_line_nr	; go to next number
-0000c0 9508                      		ret
+00009b e6a0                      		ldi	XL, low(buff_addr)
+00009c 27bb                      		clr XH
+00009d e6c4                      		ldi YL, low(buff_data)
+00009e 27dd                      		clr YH
+                                 		;clr ZH
+00009f e034                      		ldi itmp1, 4	; bytes to copy
+0000a0 91ed                      cpybuff:ld ZL, X+
+0000a1 0fe4                      		add ZL, sym_line_nr		; go to current line in char bitmap
+0000a2 9124                      		lpm	itmp, Z
+0000a3 9329                      		st Y+, itmp
+0000a4 953a                      		dec itmp1
+0000a5 f7d1                      		brne cpybuff
+0000a6 9508                      		ret
                                  		
                                  
                                  ; Here we come every time when Horisontal sync is come.
@@ -848,7 +814,7 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  ; HSOUT: -----+_+-----+_+-----+_+-----+_+-----+_+-----+_+
                                  ; VSOUT: ---------------------+___________________+------
                                  EXT_INT0:
-0000c1 b62f                      		in r_sreg, SREG
+0000a7 b62f                      		in r_sreg, SREG
                                  		; OK start timer for 12us (in CTC mode).
                                  		; OK check VSOUT pin is LOW (New Page)
                                  		; OK if no, then 
@@ -860,40 +826,40 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  		; OK if yes, then
                                  		; OK initialize for new page (lines counter, fill sram with address of printed symbols...)
                                  		; OK stop timer and exit
-0000c2 9bb2                      		sbis PINB, VSOUT_PIN
-0000c3 c014                      		rjmp vsout_newpage
+0000a8 9bb2                      		sbis PINB, VSOUT_PIN
+0000a9 c014                      		rjmp vsout_newpage
                                  		; HSOUT horisontal line routine
-0000c4 df8f                      		rcall start_timer
-0000c5 0d61                      		add	TV_lineL, z1	; +1
-0000c6 1c60                      		adc	TV_lineH, z0
+0000aa dfa7                      		rcall start_timer
+0000ab 0d61                      		add	TV_lineL, z1	; +1
+0000ac 1c60                      		adc	TV_lineH, z0
                                  		; check current line number
-0000c7 9130 0068                 		lds itmp1, TV_line_start
-0000c9 9050 0069                 		lds itmp2, TV_line_start+1
-0000cb 1763                      		cp TV_lineL, itmp1
-0000cc 0465                      		cpc TV_lineH, itmp2
-0000cd f038                      		brlo pcint_stop_tmr
+0000ad 9130 0068                 		lds itmp1, TV_line_start
+0000af 9050 0069                 		lds itmp2, TV_line_start+1
+0000b1 1763                      		cp TV_lineL, itmp1
+0000b2 0465                      		cpc TV_lineH, itmp2
+0000b3 f038                      		brlo pcint_stop_tmr
                                  		; calculate last line to print
-0000ce e02c                      		ldi itmp, SYM_HEIGHT
-0000cf 9523                      		inc itmp			; +1 for brlo comparing
-0000d0 0f32                      		add	itmp1, itmp
-0000d1 1c50                      		adc	itmp2, z0
-0000d2 1763                      		cp TV_lineL, itmp1
-0000d3 0465                      		cpc TV_lineH, itmp2
-0000d4 f008                      		brlo pcint_exit		; here we exit, because we are printing
+0000b4 e02c                      		ldi itmp, SYM_HEIGHT
+0000b5 9523                      		inc itmp			; +1 for brlo comparing
+0000b6 0f32                      		add	itmp1, itmp
+0000b7 1c50                      		adc	itmp2, z0
+0000b8 1763                      		cp TV_lineL, itmp1
+0000b9 0465                      		cpc TV_lineH, itmp2
+0000ba f008                      		brlo pcint_exit		; here we exit, because we are printing
                                  		; no printing... exit
                                  pcint_stop_tmr:
-0000d5 df7c                      		rcall stop_timer
+0000bb be09                      		out	TIMSK0, z0	;stop timer
                                  pcint_exit:
-0000d6 be2f                      		out SREG, r_sreg
-0000d7 9518                      		reti
+0000bc be2f                      		out SREG, r_sreg
+0000bd 9518                      		reti
                                  
                                  ; new page routine
                                  vsout_newpage:
-0000d8 2744                      		clr sym_line_nr	; start printing from the first line of symbol bitmap
-0000d9 2766                      		clr TV_lineL
-0000da 2466                      		clr TV_lineH
-0000db dfb0                      		rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
-0000dc cff8                      		rjmp pcint_stop_tmr			; just to make sure timer is stopped
+0000be 2744                      		clr sym_line_nr	; start printing from the first line of symbol bitmap
+0000bf 2766                      		clr TV_lineL
+0000c0 2466                      		clr TV_lineH
+0000c1 dfb1                      		rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
+0000c2 cff8                      		rjmp pcint_stop_tmr			; just to make sure timer is stopped
                                  
                                  
                                  ; Here we comming 10us later after Hsync captured.
@@ -902,25 +868,59 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  TIM0_COMPA:
                                  		; Timing here is realy critical. 
                                  		; So, be very efficient and precise with the code
-0000dd b62f                      		in r_sreg, SREG
+0000c3 b62f                      		in r_sreg, SREG
+0000c4 be09                      		out	TIMSK0, z0	;stop timer
                                  		; prepare data for printing
-0000de dfd5                      		rcall fill_num_buff_data	; 4.7us
+0000c5 dfd5                      		rcall fill_num_buff_data	; 4.7us
                                  		; Now is the delay to set horizontal position of the text
-0000df 9120 006a                 		lds	itmp, TV_col_start
+0000c6 9120 006a                 		lds	itmp, TV_col_start
                                  		; 10 iterations of this loop is about 3us.
-0000e1 952a                      tmrcpl1:dec	itmp
-0000e2 f7f1                      		brne tmrcpl1
+0000c8 952a                      tmrcpl1:dec	itmp
+0000c9 f7f1                      		brne tmrcpl1
                                  		; now time to start printing
-0000e3 e6e4                      		ldi ZL, buff_data
-0000e4 e034                      		ldi itmp1, 4
-0000e5 9121                      tmrcpl2:ld itmp, Z+
-0000e6 df8e                      		rcall PrintCharLine
-0000e7 953a                      		dec	itmp1
-0000e8 f7e1                      		brne tmrcpl2
-0000e9 9543                      		inc sym_line_nr
-0000ea be2f                      		out SREG, r_sreg
+0000ca e6e4                      		ldi ZL, low(buff_data)
+0000cb e034                      		ldi itmp1, 4
+0000cc 2c51                      		mov itmp2, z1			; Configure PIN is HIGH (preserve pullup)
+0000cd 9121                      tmrcpl2:ld itmp, Z+
+                                 ; this routine is called from interrupts, so use interrupt registers
+                                 ; print one char line (about 3us)		
+                                 PrintCharLine:
+                                 ; itmp has bits for line of symbol
+0000ce fb27                      	bst itmp,7				;1
+0000cf f854                      	bld itmp2,VIDEO_PIN		;1 
+0000d0 ba58                      	out PortB, itmp2		;1
+                                 
+0000d1 fb26                      	bst itmp,6				;1
+0000d2 f854                      	bld itmp2,VIDEO_PIN		;1 
+0000d3 ba58                      	out PortB, itmp2		;1
+                                 
+0000d4 fb25                      	bst itmp,5				;1
+0000d5 f854                      	bld itmp2,VIDEO_PIN		;1 
+0000d6 ba58                      	out PortB, itmp2		;1
+                                 
+0000d7 fb24                      	bst itmp,4				;1
+0000d8 f854                      	bld itmp2,VIDEO_PIN		;1 
+0000d9 ba58                      	out PortB, itmp2		;1
+                                 
+0000da fb23                      	bst itmp,3				;1
+0000db f854                      	bld itmp2,VIDEO_PIN		;1 
+0000dc ba58                      	out PortB, itmp2		;1
+                                 
+0000dd fb22                      	bst itmp,2				;1
+0000de f854                      	bld itmp2,VIDEO_PIN		;1 
+0000df ba58                      	out PortB, itmp2		;1
+                                 
+0000e0 0000                      	nop						;1
+0000e1 0000                      	nop						;1
+0000e2 ba18                      	out PortB,z1			;1 (clear last bit if was set, preserving Configure Pin pullup)
+                                 
+                                 
+0000e3 953a                      		dec	itmp1
+0000e4 f741                      		brne tmrcpl2
+0000e5 9543                      		inc sym_line_nr
+0000e6 be2f                      		out SREG, r_sreg
                                  .include "s_uart.inc"
-0000eb 9518                      
+0000e7 9518                      
                                  ; tmp - general temp register
                                  ; tmp1 - bit counter
                                  ; tmp2 - Received value
@@ -940,159 +940,287 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(68): Including file 'C:\git\Voltage_OSD\
                                  		
                                  ; UART -> tmp2
                                  UART_get_byte:	
-0000ec 930f                      		push tmp
-0000ed e019                      		ldi tmp1, 9			;8 data bit + 1 stop bit
+0000e8 930f                      		push tmp
                                  
-                                 uart_wait_for_start:	
-0000ee 99b0                      		sbic PINB, CONF_PIN	
-0000ef cffe                      		rjmp uart_wait_for_start
+                                 ; we wait only some milliseconds for start bit. If symbols not arrive, then seems transfer is finished
+0000e9 d05d                      		rcall wait_for_start_short
+                                 
+0000ea e019                      		ldi tmp1, 9			;8 data bit + 1 stop bit
                                  		;synchronize for 0.5 bit length
-0000f0 d00b                      		rcall UART_delay	
+0000eb d00b                      		rcall UART_delay	
                                  
                                  uart_get_bit:	
-0000f1 d00a                      		rcall UART_delay	
-0000f2 d009                      		rcall UART_delay		
+0000ec d00a                      		rcall UART_delay	
+0000ed d009                      		rcall UART_delay		
                                  
-0000f3 9488                      		clc			
-0000f4 99b0                      		sbic PINB, CONF_PIN	
-0000f5 9408                      		sec			
+0000ee 9488                      		clc			
+0000ef 99b0                      		sbic PINB, CONF_PIN	
+0000f0 9408                      		sec			
                                  		
-0000f6 951a                      		dec tmp1		
-0000f7 f011                      		breq uart_bit_done	
+0000f1 951a                      		dec tmp1		
+0000f2 f011                      		breq uart_bit_done	
                                  					
-0000f8 9447                      		ror tmp2		
-0000f9 cff7                      		rjmp uart_get_bit	
+0000f3 9447                      		ror tmp2		
+0000f4 cff7                      		rjmp uart_get_bit	
                                  
                                  uart_bit_done:	
-0000fa 910f                      		pop tmp
-0000fb 9508                      		ret
+0000f5 910f                      		pop tmp
+0000f6 9508                      		ret
                                  
                                  ; 3·DELAY_COUNT + 7 cycles (including rcall(3) and ret(4))
                                  UART_delay:	
-0000fc e40f                      		ldi tmp, DELAY_COUNT		;1
+0000f7 e40f                      		ldi tmp, DELAY_COUNT		;1
                                  UART_delay1:	
-0000fd 950a                      		dec	tmp					;1
-0000fe f7f1                      		brne UART_delay1			;2
-0000ff 9508                      		ret							;4
+0000f8 950a                      		dec	tmp						;1
+0000f9 f7f1                      		brne UART_delay1			;2
+0000fa 9508                      		ret							;4
                                  
                                  	
                                  EnterCommandMode:
-000100 94f8                      		cli	; disable interrupts (no TVout) due to critical timing on UART transmission
+0000fb 94f8                      		cli	; disable interrupts (no TVout) due to critical timing on UART transmission
                                  		; We first receive 0x55, to enable Serial
                                  		; wait until port stabilize (all 0x55 char is received)
-000101 d009                      		rcall SA_Wait_Transfer_Compelted
+0000fc d041                      		rcall SA_Wait_Transfer_Compelted
                                  		; Now wait for characters
-                                 		; One is Parameter, other three is number 000
+0000fd d049                      Cm_wt:	rcall wait_for_start_short	; we should wait for first bit forever...
+0000fe 1440                      		cp tmp2, z0
+0000ff f3e9                      		breq Cm_wt
+                                 		; something started to come
+                                 		; First byte is Parameter, other three is number 000
                                  		; we can reuse buff_data buffer to receive data
-000102 e004                      		ldi tmp, 4		; receive 4 bytes
-000103 e6e4                      		ldi Zl, low(buff_data)
-000104 dfe7                      SA_LB:	rcall UART_get_byte
-000105 9241                      		st Z+, tmp2
-000106 950a                      		dec tmp
-000107 f7e1                      		brne SA_LB
+000100 e004                      		ldi tmp, 4		; receive 4 bytes
+000101 e6e4                      		ldi Zl, low(buff_data)
+000102 dfe5                      Cm_LB:	rcall UART_get_byte
+000103 9241                      		st Z+, tmp2
+000104 950a                      		dec tmp
+000105 f7e1                      		brne Cm_LB
                                  		; Parse buffer
                                  		; Available commands:
-                                 		;  XXXX - Exit from Command mode
-                                 		;  SSSS - Save settings to EEPROM
+                                 		;  XXXX - Exit from Command mode without saving settings to EEPROM
+                                 		;  SSSS - Save settings to EEPROM and Exit
                                  		;  Lnnn - Set start TV line number for printed text
                                  		;  Cnnn - Set TV column number for printed text
                                  		;  Vnnn - Battery voltage correction
                                  		;  RRRR - Reset to Factory settings
                                  		;  TTTT - Test settings (show OSD for 5 seconds)
-000108 e6e4                      		ldi Zl, low(buff_data)
-                                 				
+000106 e6e4                      		ldi Zl, low(buff_data)
+000107 9101                      		ld tmp, Z+
+000108 3508                      		cpi tmp, 'X'
+000109 f041                      		breq Cm_Exit
+00010a 3503                      		cpi tmp, 'S'
+00010b f041                      		breq Cm_Save
+00010c 340c                      		cpi tmp, 'L'
+00010d f069                      		breq Cm_TVLine
+00010e 3403                      		cpi tmp, 'C'
+00010f f089                      		breq Cm_TVColumn
+000110 3506                      		cpi tmp, 'V'
+000111 f099                      		breq Cm_Battery
                                  
                                  
-                                 SA_Exit:	; exit from command mode
-000109 9478                      		sei		; enable TVout
-00010a 9508                      		ret
-                                 
-                                 SA_Wait_Transfer_Compelted:
-00010b 2700                      SA_L1:	clr tmp			; about 20-30ms
-00010c 2711                      		clr tmp1
-00010d 9bb0                      SA_L2:	sbis PINB, CONF_PIN
-00010e cffc                      		rjmp SA_L1				; start over, transmision is not finished
-00010f 951a                      		dec  tmp1
-000110 f7e1                      		brne SA_L2
-000111 950a                      		dec  tmp
-000112 f7d1                      		brne SA_L2
+                                 Cm_Exit:	; exit from command mode
+000112 9478                      		sei		; enable TVout
 000113 9508                      		ret
+                                 
+                                 Cm_Save:
+                                 		; save all data to EEPROM and exit
+                                 		; because this is very sensitive operation, lets double check it. Check remaining buffer for 'SSS'
+000114 e013                      		ldi tmp1, 3
+000115 9101                      Cm_SL1:	ld tmp, Z+
+000116 3503                      		cpi tmp, 'S'
+000117 f719                      		brne EnterCommandMode		; Seems command is not 'SSSS' go back to command mode. Save nothing to EEPROM
+000118 951a                      		dec tmp1
+000119 f7d9                      		brne Cm_SL1
+                                 		; TODO EEPROM save
+00011a cff7                      		rjmp Cm_Exit
+                                 
+                                 Cm_TVLine:
+                                 		;OK Convert remaining buffer to 16bit number
+                                 		;-- Check number for allowed range
+                                 		;OK Update SRAM variable
+                                 		;   Show OSD for 5 seconds
+                                 		;OK Go back to Command Mode
+00011b d00d                      		rcall Cm_ConvertBCD16bit
+                                 		; now we have a number in adc_sumL:adc_sumH
+00011c 9280 0068                 		sts TV_line_start, adc_sumL
+00011e 9290 0069                 		sts TV_line_start+1, adc_sumH
+                                 		; TODO
+                                 		
+000120 cfda                      		rjmp EnterCommandMode		; go back to Command Mode
+                                 
+                                 Cm_TVColumn:
+                                 		;OK Convert remaining buffer to 16bit number
+                                 		;-- Check number for allowed range
+                                 		;OK Update SRAM variable
+                                 		;   Show OSD for 5 seconds
+                                 		;OK Go back to Command Mode
+000121 d007                      		rcall Cm_ConvertBCD16bit
+                                 		; now we have a number in adc_sumL:adc_sumH
+000122 9280 006a                 		sts TV_col_start, adc_sumL
+                                 		; TODO
+                                 		
+000124 cfd6                      		rjmp EnterCommandMode		; go back to Command Mode
+                                 
+                                 Cm_Battery:
+                                 		;OK Convert remaining buffer to 16bit number
+                                 		;-- Check number for allowed range
+                                 		;OK Update SRAM variable
+                                 		;   Show OSD for 5 seconds
+                                 		;OK Go back to Command Mode
+000125 d003                      		rcall Cm_ConvertBCD16bit
+                                 		; now we have a number in adc_sumL:adc_sumH
+000126 9280 006b                 		sts Bat_correction, adc_sumL
+                                 		; TODO
+                                 		
+000128 cfd2                      		rjmp EnterCommandMode		; go back to Command Mode
+                                 
+                                 
+                                 ; Convert 3 bytes from SRAM pointed by Z register to 16bit number (adc_sumL:adc_sumH)
+                                 Cm_ConvertBCD16bit:
+000129 2488                      		clr adc_sumL	; reuse adc variables for storing 16 bit number
+00012a 2499                      		clr adc_sumH	; reuse adc variables for storing 16 bit number
+00012b 9101                      		ld tmp, Z+		; read 100s of number
+00012c 700f                      		andi tmp, 0b00001111	; converd BCD to bin
+                                 		; multiply by 100
+00012d e312                      		ldi tmp1, 50	; multiply by 50
+00012e d009                      		rcall Cm_multiply
+00012f 9101                      		ld tmp, Z+		; read 10s of number
+000130 700f                      		andi tmp, 0b00001111	; converd BCD to bin
+                                 		; multiply by 10
+000131 e015                      		ldi tmp1, 5	; multiply by 5
+000132 d005                      		rcall Cm_multiply
+000133 8100                      		ld tmp, Z		; read remaining of number
+000134 700f                      		andi tmp, 0b00001111	; converd BCD to bin
+000135 0e80                      		add adc_sumL, tmp
+000136 1c90                      		adc adc_sumH, z0
+000137 9508                      		ret
+                                 		
+                                 ; Multiply tmp by (tmp1/2) and add it to adc_sumL:adc_sumH
+                                 ; we supply half of tmp1 for speed purposes (we first multiply tmp by 2)
+                                 Cm_multiply:		
+000138 0f00                      		lsl tmp	; multiply by 2 
+000139 0e80                      Cm_mul1:add adc_sumL, tmp
+00013a 1c90                      		adc adc_sumH, z0
+00013b 951a                      		dec tmp1
+00013c f7e1                      		brne Cm_mul1
+00013d 9508                      		ret
+                                 
+                                 		
+                                 SA_Wait_Transfer_Compelted:
+00013e 2700                      SA_L1:	clr tmp			; about 20-30ms
+00013f 2711                      		clr tmp1
+000140 9bb0                      SA_L2:	sbis PINB, CONF_PIN
+000141 cffc                      		rjmp SA_L1				; start over, transmision is not finished
+000142 951a                      		dec  tmp1
+000143 f7e1                      		brne SA_L2
+000144 950a                      		dec  tmp
+000145 f7d1                      		brne SA_L2
+000146 9508                      		ret
+                                 
+                                 ; tmp2 returns flag for start bit: 1-start bit, 0-timeout expired
+                                 wait_for_start_short:
+000147 2c41                      		mov tmp2,z1		; flag for start bit
+000148 2700                      		clr tmp			; about 20-30ms
+000149 2711                      		clr tmp1
+00014a 9bb0                      wfs_L2:	sbis PINB, CONF_PIN
+00014b c005                      		rjmp wfs_exit				; transmission started
+00014c 951a                      		dec  tmp1
+00014d f7e1                      		brne wfs_L2
+00014e 950a                      		dec  tmp
+00014f f7d1                      		brne wfs_L2
+000150 2444                      		clr tmp2		; clear flag for start bit, because start bit did not came
+                                 wfs_exit:
+000151 9508                      		ret
                                  
                                  RESET:
                                  		; change speed (ensure 9.6 mhz ossc)
-000114 e800                      		ldi tmp, 1<<CLKPCE	
-000115 bd06                      		out CLKPR, tmp		; enable clock change
-000116 bc06                      		out CLKPR, z0		; prescaler 1
+000152 e800                      		ldi tmp, 1<<CLKPCE	
+000153 bd06                      		out CLKPR, tmp		; enable clock change
+000154 bc06                      		out CLKPR, z0		; prescaler 1
                                  
-000117 e90f                      		ldi tmp, low(RAMEND); Main program start
-000118 bf0d                      		out SPL,tmp ; Set Stack Pointer to top of RAM
+000155 e90f                      		ldi tmp, low(RAMEND); Main program start
+000156 bf0d                      		out SPL,tmp ; Set Stack Pointer to top of RAM
                                  		
                                  		;init variables
-000119 2400                      		clr z0
-00011a 2411                      		clr z1
-00011b 9413                      		inc z1
-00011c 2477                      		clr adc_cntr		; couter for ADC readings (starting from 0)
+000157 2400                      		clr z0
+000158 2411                      		clr z1
+000159 9413                      		inc z1
+00015a 2477                      		clr adc_cntr		; couter for ADC readings (starting from 0)
                                  		;clr sym_line_nr	; this variable will be initialized with new page routine
                                  
                                  		; Configure Video pin as OUTPUT (LOW)
-00011d 9abc                      		sbi	DDRB, VIDEO_PIN
+00015b 9abc                      		sbi	DDRB, VIDEO_PIN
                                  		; Enable pullup on Configure Pin. We will enter configure mode if this pin will go LOW (by PCINT interrupt)
-00011e 9ac0                      		sbi	PORTB, CONF_PIN
+00015c 9ac0                      		sbi	PORTB, CONF_PIN
                                  		
                                  		; set line from where to start printing (later we store this value in EEPROM)
-00011f e00e                      		ldi tmp, low(FIRST_PRINT_TV_LINE)
-000120 e011                      		ldi tmp1, high(FIRST_PRINT_TV_LINE)
-000121 9300 0068                 		sts TV_line_start, tmp
-000123 9310 0069                 		sts TV_line_start+1, tmp1
-000125 e00a                      		ldi tmp, low(FIRST_PRINT_TV_COLUMN)
-000126 9300 006a                 		sts TV_col_start, tmp
+00015d ec02                      		ldi tmp, low(FIRST_PRINT_TV_LINE)
+00015e e011                      		ldi tmp1, high(FIRST_PRINT_TV_LINE)
+00015f 9300 0068                 		sts TV_line_start, tmp
+000161 9310 0069                 		sts TV_line_start+1, tmp1
+000163 e104                      		ldi tmp, low(FIRST_PRINT_TV_COLUMN)
+000164 9300 006a                 		sts TV_col_start, tmp
                                  
                                  		;initialize INT0 and PCINT0 interrupts
                                  		; INT0 - VIDEO Sync
                                  		; PCINT0 - Configure protocol
-000128 e001                      		ldi tmp, 1<<ISC01 || 1<<ISC00	; falling edge
-000129 bf05                      		out MCUCR, tmp
-00012a e400                      		ldi tmp, 1<<INT0 ;|| 1<<PCIE - PCINT enabe not yet
-00012b bf0b                      		out GIMSK, tmp
+000166 e001                      		ldi tmp, 1<<ISC01 || 1<<ISC00	; falling edge
+000167 bf05                      		out MCUCR, tmp
+000168 e400                      		ldi tmp, 1<<INT0 ;|| 1<<PCIE - PCINT enabe not yet
+000169 bf0b                      		out GIMSK, tmp
                                  		; PCINT enabe not yet
                                  		;ldi tmp, 1<<CONF_PIN
                                  		;out PCMSK, tmp
                                  		
                                  		; Configure timer for CTC mode (10 us)
-00012c e002                      		ldi tmp, 1<<WGM01	; CTC mode
-00012d bd0f                      		out TCCR0A, tmp
-00012e e001                      		ldi tmp, 1<<CS00	; no prescaling (1)
-00012f bf03                      		out TCCR0B, tmp
-000130 e600                      		ldi tmp, 96		; 10us at 9.6 mhz
-000131 bf06                      		out	OCR0A, tmp
+00016a e002                      		ldi tmp, 1<<WGM01	; CTC mode
+00016b bd0f                      		out TCCR0A, tmp
+00016c e001                      		ldi tmp, 1<<CS00	; no prescaling (1)
+00016d bf03                      		out TCCR0B, tmp
+00016e e600                      		ldi tmp, 96		; 10us at 9.6 mhz
+00016f bf06                      		out	OCR0A, tmp
                                  		; Do not enable timer interrupt yet. It will be enabled only during printing data.
                                  		
                                  		; Configure ADC
                                  		; Internal 1.1Vref, ADC channel, 10bit ADC result
-000132 e001                      		ldi tmp, 1<<REFS0 || 1<<MUX0 || 1<<MUX1
-000133 b907                      		out ADMUX, tmp
+000170 e001                      		ldi tmp, 1<<REFS0 || 1<<MUX0 || 1<<MUX1
+000171 b907                      		out ADMUX, tmp
                                  		; normal mode (single conversion mode), 64 prescaler (about 150khz at 9.6mhz ossc).
-000134 e001                      		ldi tmp, 1<<ADEN || 1<<ADSC || 1<<ADPS2 || 1<<ADPS1 || 0<<ADPS0
-000135 b906                      		out ADCSRA, tmp
+000172 e001                      		ldi tmp, 1<<ADEN || 1<<ADSC || 1<<ADPS2 || 1<<ADPS1 || 0<<ADPS0
+000173 b906                      		out ADCSRA, tmp
                                  		; turn off digital circuity in analog pin
-000136 e008                      		ldi tmp, 1<<VBAT_PIN
-000137 bb04                      		out DIDR0, tmp
+000174 e008                      		ldi tmp, 1<<VBAT_PIN
+000175 bb04                      		out DIDR0, tmp
                                  		
-000138 9478                      		sei ; Enable interrupts
+000176 e75e                      		ldi voltage, 126	; for debug
+                                 /*
+                                 		rcall fill_num_buff_addr
+                                 		clr sym_line_nr
+                                 		rcall fill_num_buff_data
+                                 		inc sym_line_nr
+                                 		rcall fill_num_buff_data
+                                 		inc sym_line_nr
+                                 		rcall fill_num_buff_data
+                                 		inc sym_line_nr
+                                 		rcall fill_num_buff_data
+                                 		inc sym_line_nr
+                                 		rcall fill_num_buff_data
+                                 		inc sym_line_nr
+                                 		rcall fill_num_buff_data
+                                 */
+000177 9478                      		sei ; Enable interrupts
                                  
                                  main_loop:
                                  		; in the main loop we can run only not timing critical code like ADC reading
-000139 e75e                      		ldi voltage, 126	; for debug
                                  
                                  		; read ADSC bit to see if conversion finished
-00013a 9b36                      		sbis ADCSRA, ADSC
-00013b df1e                      		rcall ReadVoltage
+                                 		;sbis ADCSRA, ADSC
+                                 		;rcall ReadVoltage
                                  		
                                  		; Do we need to enter Configure mode?
-00013c 9bb0                      		sbis PINB, CONF_PIN
-00013d dfc2                      		rcall EnterCommandMode
+000178 9bb0                      		sbis PINB, CONF_PIN
+000179 df81                      		rcall EnterCommandMode
                                  		
-00013e cffa                      		rjmp main_loop				
+00017a cffd                      		rjmp main_loop				
                                  		
                                  
 
@@ -1112,39 +1240,39 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATtiny13A" register use summary:
-x  :   1 y  :   1 z  :   8 r0 :  10 r1 :   3 r2 :   4 r3 :   5 r4 :   6 
-r5 :  25 r6 :   4 r7 :   4 r8 :   5 r9 :   4 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  41 r17:   8 r18:  28 r19:  19 r20:   3 
+x  :   1 y  :   1 z  :  13 r0 :  13 r1 :   6 r2 :   4 r3 :   5 r4 :   9 
+r5 :  25 r6 :   4 r7 :   4 r8 :  11 r9 :   8 r10:   0 r11:   0 r12:   0 
+r13:   0 r14:   0 r15:   0 r16:  60 r17:  15 r18:  28 r19:  19 r20:   3 
 r21:   3 r22:   4 r23:   0 r24:   0 r25:   0 r26:   1 r27:   1 r28:   1 
-r29:   1 r30:   6 r31:   2 
+r29:   1 r30:   6 r31:   1 
 Registers used: 26 out of 35 (74.3%)
 
 "ATtiny13A" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   3 add   :   5 adiw  :   0 and   :   0 
-andi  :   0 asr   :   0 bclr  :   0 bld   :   6 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   2 brge  :   0 brhc  :   0 
+.lds  :   0 .sts  :   0 adc   :   5 add   :   7 adiw  :   0 and   :   0 
+andi  :   3 asr   :   0 bclr  :   0 bld   :   6 brbc  :   0 brbs  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   8 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   6 brlt  :   0 brmi  :   0 
-brne  :   8 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brne  :  13 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   6 cbi   :   0 cbr   :   0 clc   :   1 
-clh   :   0 cli   :   1 cln   :   0 clr   :  16 cls   :   0 clt   :   0 
-clv   :   0 clz   :   0 com   :   0 cp    :   7 cpc   :   3 cpi   :   0 
-cpse  :   0 dec   :   9 eor   :   0 icall :   0 ijmp  :   0 in    :   4 
-inc   :   7 ld    :   2 ldd   :   0 ldi   :  36 lds   :   3 lpm   :   2 
-lsl   :   0 lsr   :   2 mov   :   6 movw  :   0 neg   :   0 nop   :   2 
-or    :   0 ori   :   0 out   :  24 pop   :   3 push  :   3 rcall :  17 
-ret   :  11 reti  :   9 rjmp  :  11 rol   :   0 ror   :   2 sbc   :   1 
-sbci  :   0 sbi   :   3 sbic  :   2 sbis  :   4 sbiw  :   0 sbr   :   0 
+clh   :   0 cli   :   1 cln   :   0 clr   :  19 cls   :   0 clt   :   0 
+clv   :   0 clz   :   0 com   :   0 cp    :   8 cpc   :   3 cpi   :   6 
+cpse  :   0 dec   :  13 eor   :   0 icall :   0 ijmp  :   0 in    :   4 
+inc   :   7 ld    :   7 ldd   :   0 ldi   :  39 lds   :   3 lpm   :   2 
+lsl   :   1 lsr   :   2 mov   :   8 movw  :   0 neg   :   0 nop   :   2 
+or    :   0 ori   :   0 out   :  25 pop   :   3 push  :   3 rcall :  21 
+ret   :  12 reti  :   9 rjmp  :  15 rol   :   0 ror   :   2 sbc   :   1 
+sbci  :   0 sbi   :   3 sbic  :   1 sbis  :   4 sbiw  :   0 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   1 seh   :   0 sei   :   2 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
-spm   :   0 st    :   7 std   :   0 sts   :   3 sub   :   2 subi  :   0 
+spm   :   0 st    :   7 std   :   0 sts   :   7 sub   :   2 subi  :   0 
 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 39 out of 105 (37.1%)
+Instructions used: 42 out of 105 (40.0%)
 
 "ATtiny13A" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00027e    494    144    638    1024  62.3%
-[.dseg] 0x000060 0x00006b      0     11     11      64  17.2%
+[.cseg] 0x000000 0x0002f6    614    144    758    1024  74.0%
+[.dseg] 0x000060 0x00006c      0     12     12      64  18.8%
 [.eseg] 0x000000 0x000000      0      0      0      64   0.0%
 
 Assembly complete, 0 errors, 0 warnings

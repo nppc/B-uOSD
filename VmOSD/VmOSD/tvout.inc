@@ -5,40 +5,6 @@
  *   Author: Pavel
  */ 
 
-; this routine is called from interrupts, so use interrupt registers
-; print one char line (about 3us)		
-PrintCharLine:
-; itmp has bits for line of symbol
-	clr itmp2
-
-	bst itmp,0				;1
-	bld itmp2,VIDEO_PIN		;1 
-	out PortB, itmp2		;1
-
-	bst itmp,1				;1
-	bld itmp2,VIDEO_PIN		;1 
-	out PortB, itmp2		;1
-
-	bst itmp,2				;1
-	bld itmp2,VIDEO_PIN		;1 
-	out PortB, itmp2		;1
-
-	bst itmp,3				;1
-	bld itmp2,VIDEO_PIN		;1 
-	out PortB, itmp2		;1
-
-	bst itmp,4				;1
-	bld itmp2,VIDEO_PIN		;1 
-	out PortB, itmp2		;1
-
-	bst itmp,5				;1
-	bld itmp2,VIDEO_PIN		;1 
-	out PortB, itmp2		;1
-
-	nop						;1
-	nop						;1
-	out PortB,z0			;1 (clear last bit if was set)
-	ret
 	
 
 
@@ -86,8 +52,8 @@ conv_bcd_to_address:
 		push itmp1
 		ldi itmp1, low(symbols << 1)	; we need only low address byte, because fonts are at the beginning of the flash
 		ldi itmp, SYM_HEIGHT
-mult1:	add itmp1, itmp2
-		dec	itmp
+mult1:	add itmp1, itmp
+		dec	itmp2
 		brne mult1
 		mov itmp2, itmp1	; return value
 		pop itmp1
@@ -105,7 +71,7 @@ fill_num_buff_data:
 		clr XH
 		ldi YL, low(buff_data)
 		clr YH
-		clr ZH
+		;clr ZH
 		ldi itmp1, 4	; bytes to copy
 cpybuff:ld ZL, X+
 		add ZL, sym_line_nr		; go to current line in char bitmap
@@ -113,7 +79,6 @@ cpybuff:ld ZL, X+
 		st Y+, itmp
 		dec itmp1
 		brne cpybuff
-		;inc sym_line_nr	; go to next number
 		ret
 		
 
@@ -158,7 +123,7 @@ EXT_INT0:
 		brlo pcint_exit		; here we exit, because we are printing
 		; no printing... exit
 pcint_stop_tmr:
-		rcall stop_timer
+		out	TIMSK0, z0	;stop timer
 pcint_exit:
 		out SREG, r_sreg
 		reti
@@ -179,6 +144,7 @@ TIM0_COMPA:
 		; Timing here is realy critical. 
 		; So, be very efficient and precise with the code
 		in r_sreg, SREG
+		out	TIMSK0, z0	;stop timer
 		; prepare data for printing
 		rcall fill_num_buff_data	; 4.7us
 		; Now is the delay to set horizontal position of the text
@@ -187,10 +153,43 @@ TIM0_COMPA:
 tmrcpl1:dec	itmp
 		brne tmrcpl1
 		; now time to start printing
-		ldi ZL, buff_data
+		ldi ZL, low(buff_data)
 		ldi itmp1, 4
+		mov itmp2, z1			; Configure PIN is HIGH (preserve pullup)
 tmrcpl2:ld itmp, Z+
-		rcall PrintCharLine
+; this routine is called from interrupts, so use interrupt registers
+; print one char line (about 3us)		
+PrintCharLine:
+; itmp has bits for line of symbol
+	bst itmp,7				;1
+	bld itmp2,VIDEO_PIN		;1 
+	out PortB, itmp2		;1
+
+	bst itmp,6				;1
+	bld itmp2,VIDEO_PIN		;1 
+	out PortB, itmp2		;1
+
+	bst itmp,5				;1
+	bld itmp2,VIDEO_PIN		;1 
+	out PortB, itmp2		;1
+
+	bst itmp,4				;1
+	bld itmp2,VIDEO_PIN		;1 
+	out PortB, itmp2		;1
+
+	bst itmp,3				;1
+	bld itmp2,VIDEO_PIN		;1 
+	out PortB, itmp2		;1
+
+	bst itmp,2				;1
+	bld itmp2,VIDEO_PIN		;1 
+	out PortB, itmp2		;1
+
+	nop						;1
+	nop						;1
+	out PortB,z1			;1 (clear last bit if was set, preserving Configure Pin pullup)
+
+
 		dec	itmp1
 		brne tmrcpl2
 		inc sym_line_nr
