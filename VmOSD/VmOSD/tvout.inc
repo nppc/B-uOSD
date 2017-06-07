@@ -105,7 +105,7 @@ EXT_INT0:
 		cpc TV_lineH, XH
 		brlo pcint_exit			; not needed to print yet
 		; calculate last line to print
-		adiw XH:XL, SYM_HEIGHT+1	; +1 for brlo comparing
+		adiw XH:XL, SYM_HEIGHT * SYMBOL_STRETCH	; +1 for brsh comparing seems not needed
 		cp TV_lineL, XL
 		cpc TV_lineH, XH
 		brsh pcint_exit		; printing is finished, just exit
@@ -124,9 +124,8 @@ tmrcpl1:dec	itmp
 		ldi ZL, low(buff_data)
 		clr ZH
 		ldi itmp1, 4
-		mov itmp2, z1			; Configure PIN is HIGH (preserve pullup)
+		clr itmp2
 tmrcpl2:ld itmp, Z+
-		; this routine is called from interrupts, so use interrupt registers
 		; print one char line (about 3us)		
 		; itmp has bits for line of symbol
 		; ### START OF TV OUT ###
@@ -156,13 +155,17 @@ tmrcpl2:ld itmp, Z+
 
 		clt						;1 clear last bit if was set
 		bld itmp2,VIDEO_PIN		;1
-		out PORTB,z1			;1 preserving Configure Pin pullup
+		out PORTB,itmp2			;1
 
 		dec	itmp1
 		brne tmrcpl2
 		; ### END OF TV OUT ###
 		
+		sbi	PORTB, CONF_PIN		; restore back pullup for Configure pin
+		dec sym_H_cntr
+		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 		inc sym_line_nr	; go to next line of symbol
+		ldi sym_H_cntr, SYMBOL_STRETCH
 		
 pcint_exit:
 		out SREG, r_sreg
@@ -173,6 +176,7 @@ vsout_newpage:
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
 		clr TV_lineL
 		clr TV_lineH
+		ldi sym_H_cntr, SYMBOL_STRETCH
 		rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
 		rjmp pcint_exit				; exit
 

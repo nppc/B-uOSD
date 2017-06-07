@@ -1,5 +1,8 @@
 ; at 9.6mhz, 10 cycles = 1us
-.equ	CRYSTAL_FREQ = 9600000	; Hz
+.EQU	CRYSTAL_FREQ 	= 9600000	; Hz
+.EQU	BAUD 		 	= 19200 	; bps
+.EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
+
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots
 ; PAL visible lines - 576
 
@@ -30,7 +33,7 @@
 .def	itmp2		=	r4	; variables to use in interrupts
 .def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
 .def	sym_line_nr	=	r5 	; line number of printed text (0 based)
-;						r21
+.def	sym_H_cntr	=	r21	; counter for symbol stretching
 ;						r22
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
@@ -68,7 +71,7 @@ EE_Bat_correction:	.BYTE 1
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
-		reti	;rjmp WATCHDOG ; Watchdog Interrupt Handler
+		rjmp WATCHDOG ; Watchdog Interrupt Handler
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
@@ -76,6 +79,7 @@ EE_Bat_correction:	.BYTE 1
 .include "tvout.inc"
 .include "s_uart.inc"
 .include "eeprom.inc"
+.include "watchdog.inc"
 
 RESET:
 		; change speed (ensure 9.6 mhz ossc)
@@ -92,7 +96,10 @@ RESET:
 		inc z1
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
+		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
 
+		rcall WDT_off		; just in case it left on after software reset
+		
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
 		; Enable pullup on Configure Pin. We will enter configure mode if this pin will go LOW (by PCINT interrupt)

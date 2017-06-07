@@ -4,8 +4,8 @@
  *  Created: 07-Jun-17 
  *   Author: Pavel
  */ 
-Factory_data:	.DW 450			; TV Line to print 
-				.DB 30, 0		; TV Col to print and voltage offset
+Factory_data:	.DW FIRST_PRINT_TV_LINE			; TV Line to print 
+				.DB FIRST_PRINT_TV_COLUMN, 0		; TV Col to print and voltage offset
 
 ; tmp is value
 ; tmp1 is address

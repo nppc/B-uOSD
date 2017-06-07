@@ -1,10 +1,3 @@
-;*****    Registers    *****
-; tmp - general temp register
-; tmp1 - bit counter
-; tmp2 - Received value
-
-.equ	BAUD 		 = 19200 	; bps
-
 ;DELAY_COUNT is used in delay loop 
 ;pure cycles necessary per bit
 .equ	DELAY_C = CRYSTAL_FREQ / BAUD			
@@ -121,40 +114,40 @@ Cm_TVLine:
 		;OK Convert remaining buffer to 16bit number
 		;-- Check number for allowed range
 		;OK Update SRAM variable
-		;   Show OSD for 5 seconds
+		;   Show OSD for 4 seconds
 		;OK Go back to Command Mode
 		rcall Cm_ConvertBCD16bit
 		; now we have a number in adc_sumL:adc_sumH
 		sts TV_line_start, adc_sumL
 		sts TV_line_start+1, adc_sumH
-		; TODO
-		
+		rcall WDT_Start_4s			; run WDT in interrupt mode
+		rcall EnableTVout4sec
 		rjmp EnterCommandMode		; go back to Command Mode
 
 Cm_TVColumn:
 		;OK Convert remaining buffer to 16bit number
 		;-- Check number for allowed range
 		;OK Update SRAM variable
-		;   Show OSD for 5 seconds
+		;   Show OSD for 4 seconds
 		;OK Go back to Command Mode
 		rcall Cm_ConvertBCD16bit
 		; now we have a number in adc_sumL:adc_sumH
 		sts TV_col_start, adc_sumL
-		; TODO
-		
+		rcall WDT_Start_4s			; run WDT in interrupt mode
+		rcall EnableTVout4sec
 		rjmp EnterCommandMode		; go back to Command Mode
 
 Cm_Battery:
 		;OK Convert remaining buffer to 16bit number
 		;-- Check number for allowed range
 		;OK Update SRAM variable
-		;   Show OSD for 5 seconds
+		;   Show OSD for 4 seconds
 		;OK Go back to Command Mode
 		rcall Cm_ConvertBCD16bit
 		; now we have a number in adc_sumL:adc_sumH
 		sts Bat_correction, adc_sumL
-		; TODO
-		
+		rcall WDT_Start_4s			; run WDT in interrupt mode
+		rcall EnableTVout4sec
 		rjmp EnterCommandMode		; go back to Command Mode
 		
 Cm_Factory_reset:
@@ -166,8 +159,9 @@ Cm_Fr1:	ld tmp, Z+
 		dec tmp1
 		brne Cm_Fr1
 		rcall EE_Reset_factory
-		; TODO initiate a reset
-		
+		; initiate a reset
+		rcall WDT_Start_16ms
+Cm_Fr2:	rjmp Cm_Fr2					; wait until WDT reset
 
 
 ; Convert 3 bytes from SRAM pointed by Z register to 16bit number (adc_sumL:adc_sumH)
@@ -225,4 +219,12 @@ wfs_L2:	sbis PINB, CONF_PIN
 		brne wfs_L2
 		clr tmp2		; clear flag for start bit, because start bit did not came
 wfs_exit:
+		ret
+
+EnableTVout4sec:
+		clr adc_cntr
+		sei							; Enable TVout
+wt4s:	cp adc_cntr, z0
+		breq wt4s
+		cli							; Disable TVout
 		ret
