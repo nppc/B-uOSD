@@ -39,7 +39,7 @@ EEPROM_write:
 EE_Reset_factory:
 		ldi ZL, low(Factory_data << 1)
 		ldi ZH, high(Factory_data << 1)
-		ldi, tmp1, EEPROM_Start		; address in EEPROM
+		ldi tmp1, EEPROM_Start		; address in EEPROM
 EE_RstL1:
 		lpm tmp, Z+
 		rcall EEPROM_write

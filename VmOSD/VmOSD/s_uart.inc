@@ -97,7 +97,7 @@ Cm_LB:	rcall UART_get_byte
 		breq Cm_TVColumn
 		cpi tmp, 'V'
 		breq Cm_Battery
-		cpi tmp, 'К'
+		cpi tmp, 'R'
 		breq Cm_Factory_reset
 
 

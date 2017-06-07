@@ -68,7 +68,7 @@ EE_Bat_correction:	.BYTE 1
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
-		rjmp WATCHDOG ; Watchdog Interrupt Handler
+		reti	;rjmp WATCHDOG ; Watchdog Interrupt Handler
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
