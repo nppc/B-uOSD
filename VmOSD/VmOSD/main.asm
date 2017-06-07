@@ -22,20 +22,23 @@
 .def	z0			=	r0
 .def	z1			=	r1
 .def	r_sreg		=	r2	; Store SREG register in interrupts
-.def	bcd			=	r3	; temp variable for BCD conversion
 .def	tmp			=	r16
 .def	tmp1		=	r17
-.def	tmp2		=	r4
+.def	tmp2		=	r3
 .def	itmp		=	r18	; variables to use in interrupts
 .def	itmp1		=	r19	; variables to use in interrupts
-.def	itmp2		=	r5	; variables to use in interrupts
-.def	sym_line_nr	=	r20 ; line number of printed text (0 based)
-.def	voltage		=	r21	; voltage in volts * 10 (dot will be printed in)
-.def	TV_lineH	=	r6 	; counter for TV lines High byte.
-.def	TV_lineL	=	r22 ; counter for TV lines Low byte.
-.def	adc_cntr	=	r7	; counter for ADC readings
-.def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
-.def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
+.def	itmp2		=	r4	; variables to use in interrupts
+.def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
+.def	sym_line_nr	=	r5 	; line number of printed text (0 based)
+;						r21
+;						r22
+;						r23
+.def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
+.def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
+.def	adc_cntr	=	r6	; counter for ADC readings
+.def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
+.def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
+; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 
 .DSEG
 .ORG 0x60
@@ -46,8 +49,14 @@ TV_line_start:	.BYTE 2	; Line number where we start print data (from EEPROM)
 TV_col_start:	.BYTE 1	; Column number where to start print data (from EEPROM). 
 						; 10 equals about 3us.
 						; useful range about 1-100
-Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings
+Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings (from EEPROM).
 
+.ESEG
+.ORG 5				; It is good practice do not use first bytes of EEPROM to prevet its corruption
+EEPROM_Start:
+EE_TV_line_start:	.BYTE 2
+EE_TV_col_start:	.BYTE 1
+EE_Bat_correction:	.BYTE 1 
 
 .CSEG
 .ORG 0
@@ -59,13 +68,14 @@ Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog rea
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
-		reti	;rjmp WATCHDOG ; Watchdog Interrupt Handler
+		rjmp WATCHDOG ; Watchdog Interrupt Handler
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
 .include "adc.inc"
 .include "tvout.inc"
 .include "s_uart.inc"
+.include "eeprom.inc"
 
 RESET:
 		; change speed (ensure 9.6 mhz ossc)
@@ -81,7 +91,7 @@ RESET:
 		clr z1
 		inc z1
 		clr adc_cntr		; couter for ADC readings (starting from 0)
-		;clr sym_line_nr	; this variable will be initialized with new page routine
+		clr sym_line_nr		; first line of the char
 
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN

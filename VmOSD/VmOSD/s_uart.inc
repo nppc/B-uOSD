@@ -69,7 +69,8 @@ Cm_wt:	rcall wait_for_start_short	; we should wait for first bit forever...
 		; First byte is Parameter, other three is number 000
 		; we can reuse buff_data buffer to receive data
 		ldi tmp, 4		; receive 4 bytes
-		ldi Zl, low(buff_data)
+		ldi ZL, low(buff_data)
+		clr ZH
 Cm_LB:	rcall UART_get_byte
 		st Z+, tmp2
 		dec tmp
@@ -83,7 +84,8 @@ Cm_LB:	rcall UART_get_byte
 		;  Vnnn - Battery voltage correction
 		;  RRRR - Reset to Factory settings
 		;  TTTT - Test settings (show OSD for 5 seconds)
-		ldi Zl, low(buff_data)
+		ldi ZL, low(buff_data)
+		clr ZH
 		ld tmp, Z+
 		cpi tmp, 'X'
 		breq Cm_Exit
@@ -95,6 +97,8 @@ Cm_LB:	rcall UART_get_byte
 		breq Cm_TVColumn
 		cpi tmp, 'V'
 		breq Cm_Battery
+		cpi tmp, 'К'
+		breq Cm_Factory_reset
 
 
 Cm_Exit:	; exit from command mode
@@ -152,6 +156,18 @@ Cm_Battery:
 		; TODO
 		
 		rjmp EnterCommandMode		; go back to Command Mode
+		
+Cm_Factory_reset:
+		; because this is very sensitive operation, lets double check it. Check remaining buffer for 'RRR'
+		ldi tmp1, 3
+Cm_Fr1:	ld tmp, Z+
+		cpi tmp, 'R'
+		brne EnterCommandMode		; Seems command is not 'RRRR' go back to command mode. Save nothing to EEPROM
+		dec tmp1
+		brne Cm_Fr1
+		rcall EE_Reset_factory
+		; TODO initiate a reset
+		
 
 
 ; Convert 3 bytes from SRAM pointed by Z register to 16bit number (adc_sumL:adc_sumH)
