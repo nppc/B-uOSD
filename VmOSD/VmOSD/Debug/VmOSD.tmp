@@ -15,6 +15,7 @@
   <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE>
   <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE>
   <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\eeprom.inc</FILE>
+  <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
   <FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\Debug\VmOSD.obj</FILE>
@@ -27,17 +28,18 @@
   <FILE>VmOSD.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <buff_addr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>46</LINE></buff_addr>
-  <buff_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>47</LINE></buff_data>
-  <TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>48</LINE></TV_line_start>
-  <TV_col_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>49</LINE></TV_col_start>
-  <Bat_correction><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>52</LINE></Bat_correction>
-  <EEPROM_Start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>56</LINE></EEPROM_Start>
-  <EE_TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>57</LINE></EE_TV_line_start>
-  <EE_TV_col_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>58</LINE></EE_TV_col_start>
-  <EE_Bat_correction><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>59</LINE></EE_Bat_correction>
-  <RESET><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>80</LINE></RESET>
-  <EXT_INT0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>85</LINE></EXT_INT0>
+  <buff_addr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>49</LINE></buff_addr>
+  <buff_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>50</LINE></buff_data>
+  <TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>51</LINE></TV_line_start>
+  <TV_col_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>52</LINE></TV_col_start>
+  <Bat_correction><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>55</LINE></Bat_correction>
+  <EEPROM_Start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>59</LINE></EEPROM_Start>
+  <EE_TV_line_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>60</LINE></EE_TV_line_start>
+  <EE_TV_col_start><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>61</LINE></EE_TV_col_start>
+  <EE_Bat_correction><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>62</LINE></EE_Bat_correction>
+  <RESET><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>84</LINE></RESET>
+  <EXT_INT0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>82</LINE></EXT_INT0>
+  <WATCHDOG><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE><LINE>34</LINE></WATCHDOG>
   <symbols><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>7</LINE></symbols>
   <sym0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>8</LINE></sym0>
   <sym1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>15</LINE></sym1>
@@ -56,49 +58,56 @@
   <adc_L1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc</FILE><LINE>36</LINE></adc_L1>
   <adc_3><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc</FILE><LINE>43</LINE></adc_3>
   <adc_4><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc</FILE><LINE>48</LINE></adc_4>
-  <fill_num_buff_addr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>14</LINE></fill_num_buff_addr>
-  <conv_d_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>36</LINE></conv_d_bcd>
-  <clear0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>26</LINE></clear0>
-  <conv_bcd_to_address><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>48</LINE></conv_bcd_to_address>
-  <exitbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>35</LINE></exitbcd>
-  <Lbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>38</LINE></Lbcd>
-  <mult1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>51</LINE></mult1>
-  <fill_num_buff_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>62</LINE></fill_num_buff_data>
-  <cpybuff><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>70</LINE></cpybuff>
+  <fill_num_buff_addr><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>11</LINE></fill_num_buff_addr>
+  <conv_d_bcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>33</LINE></conv_d_bcd>
+  <clear0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>23</LINE></clear0>
+  <conv_bcd_to_address><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>45</LINE></conv_bcd_to_address>
+  <exitbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>32</LINE></exitbcd>
+  <Lbcd><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>35</LINE></Lbcd>
+  <mult1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>48</LINE></mult1>
+  <fill_num_buff_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>59</LINE></fill_num_buff_data>
+  <cpybuff><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>67</LINE></cpybuff>
   <vsout_newpage><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>172</LINE></vsout_newpage>
   <pcint_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>167</LINE></pcint_exit>
-  <tmrcpl1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>121</LINE></tmrcpl1>
-  <tmrcpl2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>128</LINE></tmrcpl2>
-  <UART_get_byte><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>22</LINE></UART_get_byte>
-  <wait_for_start_short><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>216</LINE></wait_for_start_short>
-  <UART_delay><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>51</LINE></UART_delay>
-  <uart_get_bit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>32</LINE></uart_get_bit>
-  <uart_bit_done><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>46</LINE></uart_bit_done>
-  <UART_delay1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>53</LINE></UART_delay1>
-  <EnterCommandMode><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>59</LINE></EnterCommandMode>
-  <SA_Wait_Transfer_Compelted><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>204</LINE></SA_Wait_Transfer_Compelted>
-  <Cm_wt><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>65</LINE></Cm_wt>
-  <Cm_LB><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>74</LINE></Cm_LB>
-  <Cm_Exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>104</LINE></Cm_Exit>
-  <Cm_Save><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>108</LINE></Cm_Save>
-  <Cm_TVLine><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>120</LINE></Cm_TVLine>
-  <Cm_TVColumn><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>134</LINE></Cm_TVColumn>
-  <Cm_Battery><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>147</LINE></Cm_Battery>
-  <Cm_Factory_reset><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>160</LINE></Cm_Factory_reset>
-  <Cm_SL1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>112</LINE></Cm_SL1>
-  <Cm_ConvertBCD16bit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>174</LINE></Cm_ConvertBCD16bit>
-  <Cm_Fr1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>163</LINE></Cm_Fr1>
+  <tmrcpl1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>118</LINE></tmrcpl1>
+  <tmrcpl2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\tvout.inc</FILE><LINE>125</LINE></tmrcpl2>
+  <UART_get_byte><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>15</LINE></UART_get_byte>
+  <wait_for_start_short><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>210</LINE></wait_for_start_short>
+  <UART_delay><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>44</LINE></UART_delay>
+  <uart_get_bit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>25</LINE></uart_get_bit>
+  <uart_bit_done><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>39</LINE></uart_bit_done>
+  <UART_delay1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>46</LINE></UART_delay1>
+  <EnterCommandMode><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>52</LINE></EnterCommandMode>
+  <SA_Wait_Transfer_Compelted><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>198</LINE></SA_Wait_Transfer_Compelted>
+  <Cm_wt><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>58</LINE></Cm_wt>
+  <Cm_LB><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>67</LINE></Cm_LB>
+  <Cm_Exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>97</LINE></Cm_Exit>
+  <Cm_Save><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>101</LINE></Cm_Save>
+  <Cm_TVLine><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>113</LINE></Cm_TVLine>
+  <Cm_TVColumn><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>127</LINE></Cm_TVColumn>
+  <Cm_Battery><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>140</LINE></Cm_Battery>
+  <Cm_Factory_reset><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>153</LINE></Cm_Factory_reset>
+  <Cm_SL1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>105</LINE></Cm_SL1>
+  <Cm_ConvertBCD16bit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>168</LINE></Cm_ConvertBCD16bit>
+  <WDT_Start_4s><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE><LINE>3</LINE></WDT_Start_4s>
+  <EnableTVout4sec><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>224</LINE></EnableTVout4sec>
+  <Cm_Fr1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>156</LINE></Cm_Fr1>
   <EE_Reset_factory><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\eeprom.inc</FILE><LINE>39</LINE></EE_Reset_factory>
-  <Cm_multiply><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>195</LINE></Cm_multiply>
-  <Cm_mul1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>197</LINE></Cm_mul1>
-  <SA_L1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>205</LINE></SA_L1>
-  <SA_L2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>207</LINE></SA_L2>
-  <wfs_L2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>220</LINE></wfs_L2>
-  <wfs_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>227</LINE></wfs_exit>
+  <WDT_Start_16ms><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE><LINE>6</LINE></WDT_Start_16ms>
+  <Cm_Fr2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>164</LINE></Cm_Fr2>
+  <Cm_multiply><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>189</LINE></Cm_multiply>
+  <Cm_mul1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>191</LINE></Cm_mul1>
+  <SA_L1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>199</LINE></SA_L1>
+  <SA_L2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>201</LINE></SA_L2>
+  <wfs_L2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>214</LINE></wfs_L2>
+  <wfs_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>221</LINE></wfs_exit>
+  <wt4s><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\s_uart.inc</FILE><LINE>227</LINE></wt4s>
   <Factory_data><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\eeprom.inc</FILE><LINE>7</LINE></Factory_data>
   <EEPROM_read><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\eeprom.inc</FILE><LINE>12</LINE></EEPROM_read>
   <EEPROM_write><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\eeprom.inc</FILE><LINE>23</LINE></EEPROM_write>
   <EE_RstL1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\eeprom.inc</FILE><LINE>43</LINE></EE_RstL1>
-  <main_loop><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>131</LINE></main_loop>
+  <WDT_Start_code><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE><LINE>8</LINE></WDT_Start_code>
+  <WDT_off><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE><LINE>18</LINE></WDT_off>
+  <main_loop><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm</FILE><LINE>139</LINE></main_loop>
  </LABELS>
 </ASSEMBLER_INFO>

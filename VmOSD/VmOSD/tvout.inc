@@ -6,9 +6,6 @@
  */ 
 
 	
-
-
-	
 ; this routine is called from interrupts, so use interrupt registers
 ; voltage is input parameter	
 fill_num_buff_addr:
@@ -105,7 +102,7 @@ EXT_INT0:
 		cpc TV_lineH, XH
 		brlo pcint_exit			; not needed to print yet
 		; calculate last line to print
-		adiw XH:XL, SYM_HEIGHT * SYMBOL_STRETCH	; +1 for brsh comparing seems not needed
+		adiw XH:XL, SYM_HEIGHT * SYMBOL_STRETCH
 		cp TV_lineL, XL
 		cpc TV_lineH, XH
 		brsh pcint_exit		; printing is finished, just exit

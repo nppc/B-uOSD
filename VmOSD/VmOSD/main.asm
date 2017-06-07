@@ -7,7 +7,7 @@
 ; PAL visible lines - 576
 
 
-.EQU	FIRST_PRINT_TV_LINE 	= 450	; Line where we start to print
+.EQU	FIRST_PRINT_TV_LINE 	= 200	; Line where we start to print
 .EQU	FIRST_PRINT_TV_COLUMN 	= 30	; Line where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
@@ -83,9 +83,6 @@ EE_Bat_correction:	.BYTE 1
 
 RESET:
 		; change speed (ensure 9.6 mhz ossc)
-		ldi tmp, 1<<CLKPCE	
-		out CLKPR, tmp		; enable clock change
-		out CLKPR, z0		; prescaler 1
 
 		ldi tmp, low(RAMEND); Main program start
 		out SPL,tmp ; Set Stack Pointer to top of RAM
@@ -97,6 +94,10 @@ RESET:
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
 		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
+
+		ldi tmp, 1<<CLKPCE	
+		out CLKPR, tmp		; enable clock change
+		out CLKPR, z0		; prescaler 1
 
 		rcall WDT_off		; just in case it left on after software reset
 		
@@ -115,21 +116,21 @@ RESET:
 
 		;initialize INT0 
 		; INT0 - VIDEO Sync
-		ldi tmp, 1<<ISC01 || 1<<ISC00	; falling edge
+		ldi tmp, 1<<ISC01 | 1<<ISC00	; falling edge
 		out MCUCR, tmp
 		ldi tmp, 1<<INT0 
 		out GIMSK, tmp
 				
 		; Configure ADC
 		; Internal 1.1Vref, ADC channel, 10bit ADC result
-		ldi tmp, 1<<REFS0 || 1<<MUX0 || 1<<MUX1
+		ldi tmp, 1<<REFS0 | 1<<MUX0 | 1<<MUX1
 		out ADMUX, tmp
 		; normal mode (single conversion mode), 64 prescaler (about 150khz at 9.6mhz ossc).
-		ldi tmp, 1<<ADEN || 1<<ADSC || 1<<ADPS2 || 1<<ADPS1 || 0<<ADPS0
+		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 0<<ADPS0
 		out ADCSRA, tmp
 		; turn off digital circuity in analog pin
-		ldi tmp, 1<<VBAT_PIN
-		out DIDR0, tmp
+		;ldi tmp, 1<<VBAT_PIN
+		;out DIDR0, tmp
 		
 		ldi voltage, 126	; for debug
 
