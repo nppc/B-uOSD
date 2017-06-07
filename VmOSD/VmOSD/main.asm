@@ -5,16 +5,16 @@
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 450	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 20	; Line where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 30	; Line where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
 										
-.EQU	SYM_HEIGHT 				= 12 ;(last zero is padding byte)
+.EQU	SYM_HEIGHT 				= 12 	;(last zero is padding byte)
 
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
-.EQU	HSOUT_PIN	= PB1	; Horizontal sync pin
+.EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
 .EQU	CONF_PIN	= PB0	; Pin for device Configuration
 .EQU	VBAT_PIN	= PB3	; Resistor divider (15K/1K) for voltage measurement (4S max)
 .EQU	VIDEO_PIN	= PB4	; OSD Video OUT
@@ -57,13 +57,12 @@ Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog rea
 		reti	;rjmp TIM0_OVF ; Timer0 Overflow Handler
 		reti	;rjmp EE_RDY ; EEPROM Ready Handler
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
-		rjmp TIM0_COMPA ; Timer0 CompareA Handler
+		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
 		reti	;rjmp WATCHDOG ; Watchdog Interrupt Handler
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
-.include "timer.inc"
 .include "adc.inc"
 .include "tvout.inc"
 .include "s_uart.inc"
@@ -97,26 +96,13 @@ RESET:
 		ldi tmp, low(FIRST_PRINT_TV_COLUMN)
 		sts TV_col_start, tmp
 
-		;initialize INT0 and PCINT0 interrupts
+		;initialize INT0 
 		; INT0 - VIDEO Sync
-		; PCINT0 - Configure protocol
 		ldi tmp, 1<<ISC01 || 1<<ISC00	; falling edge
 		out MCUCR, tmp
-		ldi tmp, 1<<INT0 ;|| 1<<PCIE - PCINT enabe not yet
+		ldi tmp, 1<<INT0 
 		out GIMSK, tmp
-		; PCINT enabe not yet
-		;ldi tmp, 1<<CONF_PIN
-		;out PCMSK, tmp
-		
-		; Configure timer for CTC mode (10 us)
-		ldi tmp, 1<<WGM01	; CTC mode
-		out TCCR0A, tmp
-		ldi tmp, 1<<CS00	; no prescaling (1)
-		out TCCR0B, tmp
-		ldi tmp, 96		; 10us at 9.6 mhz
-		out	OCR0A, tmp
-		; Do not enable timer interrupt yet. It will be enabled only during printing data.
-		
+				
 		; Configure ADC
 		; Internal 1.1Vref, ADC channel, 10bit ADC result
 		ldi tmp, 1<<REFS0 || 1<<MUX0 || 1<<MUX1
@@ -129,21 +115,7 @@ RESET:
 		out DIDR0, tmp
 		
 		ldi voltage, 126	; for debug
-/*
-		rcall fill_num_buff_addr
-		clr sym_line_nr
-		rcall fill_num_buff_data
-		inc sym_line_nr
-		rcall fill_num_buff_data
-		inc sym_line_nr
-		rcall fill_num_buff_data
-		inc sym_line_nr
-		rcall fill_num_buff_data
-		inc sym_line_nr
-		rcall fill_num_buff_data
-		inc sym_line_nr
-		rcall fill_num_buff_data
-*/
+
 		sei ; Enable interrupts
 
 main_loop:
