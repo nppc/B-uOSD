@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Wed Jun 07 20:40:13 2017
+AVRASM ver. 2.2.6  C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm Wed Jun 07 21:06:46 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.0.79\avrasm\inc\tn13adef.inc'
 C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(77): Including file 'C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc'
@@ -498,7 +498,7 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
                                  
                                  .EQU	CRYSTAL_FREQ 	= 9600000	; Hz
                                  .EQU	BAUD 		 	= 19200 	; bps
-                                 .EQU 	SYMBOL_STRETCH 	= 1		; copy every line of symbol SYMBOL_STRETCH times
+                                 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
                                  
                                  ; PAL visible dots in 51.9us (498 cycles) or 166 dots
                                  ; PAL visible lines - 576
@@ -579,19 +579,31 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
                                   *   Author: Pavel
                                   */ 
                                  symbols:
-00000a 7020                      sym0:	.DB 0b00100000,	0b01110000
-00000b 88d8                      		.DB 0b11011000, 0b10001000
-00000c 8888                      		.DB 0b10001000, 0b10001000
-00000d 8888                      		.DB 0b10001000, 0b10001000
-00000e 70d8                      		.DB 0b11011000, 0b01110000
-00000f 0020                      		.DB 0b00100000, 0
+                                 sym0:	.DB 0b00100000, \
+                                 			0b01110000, \
+00000a 7020                      			0b11011000, \
+                                 			0b10001000, \
+00000b 88d8                      			0b10001000, \
+                                 			0b10001000, \
+00000c 8888                      			0b10001000, \
+                                 			0b10001000, \
+00000d 8888                      			0b11011000, \
+                                 			0b01110000, \
+00000e 70d8                      			0b00100000, \
+00000f 0020                      			0
                                  
-000010 6020                      sym1:	.DB 0b00100000, 0b01100000
-000011 20e0                      		.DB 0b11100000, 0b00100000
-000012 2020                      		.DB 0b00100000, 0b00100000
-000013 2020                      		.DB 0b00100000, 0b00100000
-000014 f820                      		.DB 0b00100000, 0b11111000
-000015 00f8                      		.DB 0b11111000, 0
+                                 sym1:	.DB 0b00100000, \
+                                 			0b01100000, \
+000010 6020                      			0b11100000, \
+                                 			0b00100000, \
+000011 20e0                      			0b00100000, \
+                                 			0b00100000, \
+000012 2020                      			0b00100000, \
+                                 			0b00100000, \
+000013 2020                      			0b00100000, \
+                                 			0b11111000, \
+000014 f820                      			0b11111000, \
+000015 00f8                      			0
                                  		
 000016 d870                      sym2:	.DB 0b01110000, 0b11011000
 000017 0808                      		.DB 0b00001000, 0b00001000
@@ -818,7 +830,7 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
 0000a4 079b                      		cpc TV_lineH, XH
 0000a5 f138                      		brlo pcint_exit			; not needed to print yet
                                  		; calculate last line to print
-0000a6 961c                      		adiw XH:XL, SYM_HEIGHT * SYMBOL_STRETCH
+0000a6 9658                      		adiw XH:XL, SYM_HEIGHT * SYMBOL_STRETCH
 0000a7 178a                      		cp TV_lineL, XL
 0000a8 079b                      		cpc TV_lineH, XH
 0000a9 f518                      		brsh pcint_exit		; printing is finished, just exit
@@ -878,7 +890,7 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
 0000c9 955a                      		dec sym_H_cntr
 0000ca f411                      		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 0000cb 9453                      		inc sym_line_nr	; go to next line of symbol
-0000cc e051                      		ldi sym_H_cntr, SYMBOL_STRETCH
+0000cc e052                      		ldi sym_H_cntr, SYMBOL_STRETCH
                                  		
                                  pcint_exit:
 0000cd be2f                      		out SREG, r_sreg
@@ -889,7 +901,7 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
 0000cf 2455                      		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
 0000d0 2788                      		clr TV_lineL
 0000d1 2799                      		clr TV_lineH
-0000d2 e051                      		ldi sym_H_cntr, SYMBOL_STRETCH
+0000d2 e052                      		ldi sym_H_cntr, SYMBOL_STRETCH
 0000d3 df99                      		rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
 0000d4 cff8                      		rjmp pcint_exit				; exit
                                  
@@ -1222,7 +1234,7 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
 00018b 9413                      		inc z1
 00018c 2466                      		clr adc_cntr		; couter for ADC readings (starting from 0)
 00018d 2455                      		clr sym_line_nr		; first line of the char
-00018e e051                      		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
+00018e e052                      		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
                                  
 00018f e800                      		ldi tmp, 1<<CLKPCE	
 000190 bd06                      		out CLKPR, tmp		; enable clock change
@@ -1258,12 +1270,12 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
 0001a4 ec06                      		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 0<<ADPS0
 0001a5 b906                      		out ADCSRA, tmp
                                  		; turn off digital circuity in analog pin
-                                 		;ldi tmp, 1<<VBAT_PIN
-                                 		;out DIDR0, tmp
+0001a6 e008                      		ldi tmp, 1<<VBAT_PIN
+0001a7 bb04                      		out DIDR0, tmp
                                  		
-0001a6 e74e                      		ldi voltage, 126	; for debug
+0001a8 e74e                      		ldi voltage, 126	; for debug
                                  
-0001a7 9478                      		sei ; Enable interrupts
+0001a9 9478                      		sei ; Enable interrupts
                                  
                                  main_loop:
                                  		; in the main loop we can run only not timing critical code like ADC reading
@@ -1273,10 +1285,10 @@ C:\git\Voltage_OSD\VmOSD\VmOSD\main.asm(82): Including file 'C:\git\Voltage_OSD\
                                  		;rcall ReadVoltage
                                  		
                                  		; Do we need to enter Configure mode?
-0001a8 9bb0                      		sbis PINB, CONF_PIN
-0001a9 df3e                      		rcall EnterCommandMode
+0001aa 9bb0                      		sbis PINB, CONF_PIN
+0001ab df3c                      		rcall EnterCommandMode
                                  		
-0001aa cffd                      		rjmp main_loop				
+0001ac cffd                      		rjmp main_loop				
                                  		
                                  
 
@@ -1298,7 +1310,7 @@ counted separately from r26..r31 here.
 "ATtiny13A" register use summary:
 x  :   1 y  :   1 z  :  15 r0 :  11 r1 :   4 r2 :   4 r3 :   9 r4 :  22 
 r5 :   4 r6 :   7 r7 :  11 r8 :   8 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  67 r17:  25 r18:  16 r19:  10 r20:   3 
+r13:   0 r14:   0 r15:   0 r16:  69 r17:  25 r18:  16 r19:  10 r20:   3 
 r21:   4 r22:   0 r23:   0 r24:   4 r25:   4 r26:   5 r27:   8 r28:   1 
 r29:   1 r30:   7 r31:   6 
 Registers used: 26 out of 35 (74.3%)
@@ -1313,9 +1325,9 @@ brvs  :   0 bset  :   0 bst   :   5 cbi   :   0 cbr   :   0 clc   :   1
 clh   :   0 cli   :   2 cln   :   0 clr   :  26 cls   :   0 clt   :   1 
 clv   :   0 clz   :   0 com   :   0 cp    :   9 cpc   :   3 cpi   :   9 
 cpse  :   0 dec   :  15 eor   :   0 icall :   0 ijmp  :   0 in    :   8 
-inc   :   7 ld    :   8 ldd   :   0 ldi   :  40 lds   :   3 lpm   :   3 
+inc   :   7 ld    :   8 ldd   :   0 ldi   :  41 lds   :   3 lpm   :   3 
 lsl   :   1 lsr   :   2 mov   :   6 movw  :   0 neg   :   0 nop   :   0 
-or    :   0 ori   :   2 out   :  24 pop   :   1 push  :   1 rcall :  30 
+or    :   0 ori   :   2 out   :  25 pop   :   1 push  :   1 rcall :  30 
 ret   :  17 reti  :   9 rjmp  :  19 rol   :   0 ror   :   2 sbc   :   1 
 sbci  :   0 sbi   :   7 sbic  :   3 sbis  :   4 sbiw  :   0 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   1 seh   :   0 sei   :   3 sen   :   0 
@@ -1327,7 +1339,7 @@ Instructions used: 47 out of 105 (44.8%)
 "ATtiny13A" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000356    706    148    854    1024  83.4%
+[.cseg] 0x000000 0x00035a    710    148    858    1024  83.8%
 [.dseg] 0x000060 0x00006c      0     12     12      64  18.8%
 [.eseg] 0x000005 0x000009      0      4      4      64   6.3%
 

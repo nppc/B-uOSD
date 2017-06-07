@@ -129,8 +129,8 @@ RESET:
 		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 0<<ADPS0
 		out ADCSRA, tmp
 		; turn off digital circuity in analog pin
-		;ldi tmp, 1<<VBAT_PIN
-		;out DIDR0, tmp
+		ldi tmp, 1<<VBAT_PIN
+		out DIDR0, tmp
 		
 		ldi voltage, 126	; for debug
 

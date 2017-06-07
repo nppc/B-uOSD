@@ -42,17 +42,17 @@
   <WATCHDOG><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\watchdog.inc</FILE><LINE>34</LINE></WATCHDOG>
   <symbols><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>7</LINE></symbols>
   <sym0><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>8</LINE></sym0>
-  <sym1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>15</LINE></sym1>
-  <sym2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>22</LINE></sym2>
-  <sym3><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>29</LINE></sym3>
-  <sym4><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>36</LINE></sym4>
-  <sym5><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>43</LINE></sym5>
-  <sym6><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>50</LINE></sym6>
-  <sym7><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>57</LINE></sym7>
-  <sym8><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>64</LINE></sym8>
-  <sym9><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>71</LINE></sym9>
-  <symdot><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>78</LINE></symdot>
-  <symspc><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>85</LINE></symspc>
+  <sym1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>21</LINE></sym1>
+  <sym2><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>34</LINE></sym2>
+  <sym3><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>41</LINE></sym3>
+  <sym4><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>48</LINE></sym4>
+  <sym5><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>55</LINE></sym5>
+  <sym6><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>62</LINE></sym6>
+  <sym7><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>69</LINE></sym7>
+  <sym8><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>76</LINE></sym8>
+  <sym9><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>83</LINE></sym9>
+  <symdot><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>90</LINE></symdot>
+  <symspc><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\font.inc</FILE><LINE>97</LINE></symspc>
   <ReadVoltage><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc</FILE><LINE>13</LINE></ReadVoltage>
   <adc_exit><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc</FILE><LINE>49</LINE></adc_exit>
   <adc_L1><FILE>C:\git\Voltage_OSD\VmOSD\VmOSD\adc.inc</FILE><LINE>36</LINE></adc_L1>
