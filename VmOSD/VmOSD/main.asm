@@ -1,3 +1,21 @@
+/*
+ * Author of B-uOSD is Pavel Palonen
+ *
+ * B-uOSD is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * B-uOSD is distributed WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * this text shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 ; at 9.6mhz, 10 cycles = 1us
 .EQU	OVERCLOCK_VAL	= 8			; How much to add to OSCCAL for overclocking (8 seems safe value)
 .EQU	CRYSTAL_FREQ 	= 10400000	;9600000	; in Hz (10.4mhz)

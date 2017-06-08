@@ -1,4 +1,22 @@
+/*
+ * Author of B-uOSD is Pavel Palonen
+ *
+ * B-uOSD is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * B-uOSD is distributed WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * this text shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+ 
 ; ensure, that Interrupts are disabled before calling one of the routines here
 WDT_Start_4s:	; with interrupt behaviour
 		ldi   tmp1, (0<<WDE) | (1<<WDTIE) | (1<<WDP3) | (0<<WDP2) | (0<<WDP1) | (0<<WDP0)		; 4s

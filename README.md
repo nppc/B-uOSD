@@ -21,6 +21,7 @@ Connect to PC or tablet with any Serial2USB converter. Connect 3 wires:
 - OSD VCC -> Serial2USB VCC
 - OSD GND -> Serial2USB GND
 - OSD C -> Serial2USB TX
+
 OSD can be connected to the video signal to see changes on screen in live.
 ### Changing configuration
 1. To enter to configuration mode, type in terminal UUU and press enter. OSD will disappear from the screen.
