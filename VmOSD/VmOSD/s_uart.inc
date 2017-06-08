@@ -169,13 +169,14 @@ Cm_Factory_reset:
 		ldi tmp1, 3
 Cm_Fr1:	ld tmp, Z+
 		cpi tmp, 'R'
-		brne EnterCommandMode		; Seems command is not 'RRRR' go back to command mode. Save nothing to EEPROM
+		brne Cm_Fr3			; Seems command is not 'RRRR' go back to command mode. Save nothing to EEPROM
 		dec tmp1
 		brne Cm_Fr1
 		rcall EE_Reset_factory
 		; initiate a reset
 		rcall WDT_Start_16ms
 Cm_Fr2:	rjmp Cm_Fr2					; wait until WDT reset
+Cm_Fr3:	rjmp EnterCommandMode		; relative branch is too long...
 
 Cm_Show_OSD:
 		rjmp EnableTVout4sec

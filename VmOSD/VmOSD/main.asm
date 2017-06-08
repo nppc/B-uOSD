@@ -17,8 +17,8 @@
  */
 
 ; at 9.6mhz, 10 cycles = 1us
-.EQU	OVERCLOCK_VAL	= 8			; How much to add to OSCCAL for overclocking (8 seems safe value)
-.EQU	CRYSTAL_FREQ 	= 10400000	;9600000	; in Hz (10.4mhz)
+.EQU	OVERCLOCK_VAL	= 16			; How much to add to OSCCAL for overclocking (8 seems safe value)
+.EQU	CRYSTAL_FREQ 	= 11500000	;9600000	; in Hz (11.5mhz)
 .EQU	BAUD 		 	= 19200 	; bps
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
@@ -27,7 +27,7 @@
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 60	; Column where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 130	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186

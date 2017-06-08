@@ -23,7 +23,7 @@
 fill_num_buff_addr:
 		clr ZH
 		ldi ZL, low(buff_addr)
-		ldi, itmp, low(symdron << 1)	; bitmap
+		ldi itmp, low(symgoog << 1)	; bitmap
 		st Z+, itmp
 		ldi itmp, low(symspc << 1)		; space
 		st Z, itmp
