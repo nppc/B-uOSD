@@ -21,9 +21,10 @@ EEPROM_read:
 		ret
 
 EEPROM_write:
+		rcall SlowdownMCU ; get back to nominal freq
 		; Wait for completion of any previous operations
-		sbic EECR, EEPE
-		rjmp EEPROM_write 
+		;sbic EECR, EEPE
+		;rjmp EEPROM_write 
 		; Set Programming mode
 		out EECR, z0
 		out EEARL, tmp1	; address
@@ -32,6 +33,10 @@ EEPROM_write:
 		sbi EECR, EEMPE
 		; Start eeprom write by setting EEPE
 		sbi EECR, EEPE
+		; Wait until write is finished
+EE_wrL:	sbic EECR, EEPE
+		rjmp EE_wrL 
+		rcall OverclockMCU ; get back to insane speed
 		ret
 		
 ; reset EEPROM to factory settings. After resetting MCU reset (via Watchdog) should be issued.

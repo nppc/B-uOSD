@@ -1,5 +1,6 @@
 ; at 9.6mhz, 10 cycles = 1us
-.EQU	CRYSTAL_FREQ 	= 9600000	; Hz
+.EQU	OVERCLOCK_VAL	= 8			; How much to add to OSCCAL for overclocking (8 seems safe value)
+.EQU	CRYSTAL_FREQ 	= 10400000	;9600000	; in Hz (10.4mhz)
 .EQU	BAUD 		 	= 19200 	; bps
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
@@ -29,17 +30,16 @@
 .def	itmp		=	r18	; variables to use in interrupts
 .def	itmp1		=	r19	; variables to use in interrupts
 .def	itmp2		=	r4	; variables to use in interrupts
-.def	itmp3		=	r5	; variables to use in interrupts
 .def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
-.def	sym_line_nr	=	r6 	; line number of printed text (0 based)
+.def	sym_line_nr	=	r5 	; line number of printed text (0 based)
 .def	sym_H_cntr	=	r21	; counter for symbol stretching
 ;						r22
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
-.def	adc_cntr	=	r7	; counter for ADC readings
-.def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
-.def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
+.def	adc_cntr	=	r6	; counter for ADC readings
+.def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
+.def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 
 .DSEG
@@ -96,8 +96,10 @@ RESET:
 		ldi tmp, 1<<CLKPCE	
 		out CLKPR, tmp		; enable clock change
 		out CLKPR, z0		; prescaler 1
-
+		
 		rcall WDT_off		; just in case it left on after software reset
+
+		rcall OverclockMCU
 		
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
@@ -148,3 +150,26 @@ main_loop:
 		rjmp main_loop				
 		
 
+OverclockMCU:
+		; overclock cpu from 9.6mhz to 10.4mhz (9% is safe margin. Going higher will corrupt EEPROM writes.)
+		; need to do it slowly
+		; it is only 8 OSCCAL units
+		ldi tmp, OVERCLOCK_VAL
+		in tmp1, OSCCAL
+OSC_up:	inc tmp1
+		out OSCCAL, tmp1
+		dec tmp
+		brne OSC_up
+		ret
+		
+SlowdownMCU:
+		; slowdown CPU from 10.4mhz to 9.6mhz (for safe EEPROM writes.)
+		; need to do it slowly
+		; it is only 8 OSCCAL units
+		ldi tmp, OVERCLOCK_VAL
+		in tmp1, OSCCAL
+OSC_dn:	dec tmp1
+		out OSCCAL, tmp1
+		dec tmp
+		brne OSC_dn
+		ret
