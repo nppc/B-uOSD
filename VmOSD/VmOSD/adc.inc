@@ -57,7 +57,11 @@ adc_3:	; now we have reminder in adc_sumL. Lets add it to the final result
 		cp adc_sumL, tmp
 		brlo adc_4
 		inc tmp2	; add 1 (actually it is 0.1) to the result if reminder is 0.5 or greather
-adc_4:	mov voltage, tmp2	; now we have beautiful result for printing
+adc_4:	;apply voltage adjustment
+		lds tmp, Bat_correction
+		add tmp2, tmp
+		; return voltage for OSD 
+		mov voltage, tmp2	; now we have beautiful result for printing
 adc_exit:
 		ret
 				

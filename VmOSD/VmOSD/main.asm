@@ -65,11 +65,11 @@
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
 buff_addr:		.BYTE 5	; We have 5 symbols to print
 buff_data:		.BYTE 5	; We have 5 symbols to print
-TV_line_start:	.BYTE 2	; Line number where we start print data (from EEPROM)
-TV_col_start:	.BYTE 1	; Column number where to start print data (from EEPROM). 
+TV_line_start:	.BYTE 2	; Line number where we start print data (Configurable)
+TV_col_start:	.BYTE 1	; Column number where to start print data (Configurable). 
 						; 10 equals about 3us.
 						; useful range about 1-100
-Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings (from EEPROM).
+Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings (Configurable).
 
 .ESEG
 .ORG 5				; It is good practice do not use first bytes of EEPROM to prevet its corruption

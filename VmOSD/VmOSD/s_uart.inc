@@ -112,6 +112,8 @@ Cm_LB:	rcall UART_get_byte
 		breq Cm_Battery
 		cpi tmp, 'R'
 		breq Cm_Factory_reset
+		cpi tmp, 'T'
+		breq Cm_Show_OSD
 
 
 Cm_Exit:	; exit from command mode
@@ -131,44 +133,36 @@ Cm_SL1:	ld tmp, Z+
 		rjmp Cm_Exit
 
 Cm_TVLine:
-		;OK Convert remaining buffer to 16bit number
-		;-- Check number for allowed range
-		;OK Update SRAM variable
-		;   Show OSD for 4 seconds
-		;OK Go back to Command Mode
 		rcall Cm_ConvertBCD16bit
 		; now we have a number in adc_sumL:adc_sumH
 		sts TV_line_start, adc_sumL
 		sts TV_line_start+1, adc_sumH
-		rcall WDT_Start_4s			; run WDT in interrupt mode
-		rcall EnableTVout4sec
-		rjmp EnterCommandMode		; go back to Command Mode
+		rjmp EnableTVout4sec
 
 Cm_TVColumn:
-		;OK Convert remaining buffer to 16bit number
-		;-- Check number for allowed range
-		;OK Update SRAM variable
-		;   Show OSD for 4 seconds
-		;OK Go back to Command Mode
 		rcall Cm_ConvertBCD16bit
 		; now we have a number in adc_sumL:adc_sumH
 		sts TV_col_start, adc_sumL
-		rcall WDT_Start_4s			; run WDT in interrupt mode
-		rcall EnableTVout4sec
-		rjmp EnterCommandMode		; go back to Command Mode
+		rjmp EnableTVout4sec
 
 Cm_Battery:
-		;OK Convert remaining buffer to 16bit number
-		;-- Check number for allowed range
-		;OK Update SRAM variable
-		;   Show OSD for 4 seconds
-		;OK Go back to Command Mode
+		; check, does the number contains sign?
+		mov tmp2, z1	; assum we have negative number
+		ld tmp, Z		; read buffer to determine sign char
+		cpi tmp, '-'
+		breq Cm_Bneg
+		clr tmp2		; no, number is not negative 
+Cm_Bneg:
+		;now we know the sign of the number, lets convert it to binary
+		ldi tmp, '0'
+		st Z, tmp
 		rcall Cm_ConvertBCD16bit
 		; now we have a number in adc_sumL:adc_sumH
+		; we need only adc_sumL
+		cpse tmp2, z0	;dont make negative
+		neg adc_sumL
 		sts Bat_correction, adc_sumL
-		rcall WDT_Start_4s			; run WDT in interrupt mode
-		rcall EnableTVout4sec
-		rjmp EnterCommandMode		; go back to Command Mode
+		rjmp Cm_Exit	; Here we exit because to see effect of voltage correction we can only if ADC is read and recalculated in main loop
 		
 Cm_Factory_reset:
 		; because this is very sensitive operation, lets double check it. Check remaining buffer for 'RRR'
@@ -182,6 +176,10 @@ Cm_Fr1:	ld tmp, Z+
 		; initiate a reset
 		rcall WDT_Start_16ms
 Cm_Fr2:	rjmp Cm_Fr2					; wait until WDT reset
+
+Cm_Show_OSD:
+		rjmp EnableTVout4sec
+		
 
 
 ; Convert 3 bytes from SRAM pointed by Z register to 16bit number (adc_sumL:adc_sumH)
@@ -242,10 +240,11 @@ wfs_exit:
 		ret
 
 EnableTVout4sec:
+		rcall WDT_Start_4s			; start WDT in interrupt mode
 		clr adc_cntr
 		sei							; Enable TVout
 wt4s:	cp adc_cntr, z0
 		breq wt4s
 		cli							; Disable TVout
 		rcall WDT_off				; disable watchog
-		ret
+		rjmp EnterCommandMode		; go back to Command Mode
