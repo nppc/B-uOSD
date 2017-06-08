@@ -4,11 +4,11 @@
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots
-; PAL visible lines - 576
+; PAL visible lines - 576 (interleased is half of that)
 
 
-.EQU	FIRST_PRINT_TV_LINE 	= 200	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 30	; Line where we start to print
+.EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 60	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
@@ -82,8 +82,6 @@ EE_Bat_correction:	.BYTE 1
 .include "watchdog.inc"
 
 RESET:
-		; change speed (ensure 9.6 mhz ossc)
-
 		ldi tmp, low(RAMEND); Main program start
 		out SPL,tmp ; Set Stack Pointer to top of RAM
 		
@@ -95,6 +93,7 @@ RESET:
 		clr sym_line_nr		; first line of the char
 		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
 
+		; change speed (ensure 9.6 mhz ossc)
 		ldi tmp, 1<<CLKPCE	
 		out CLKPR, tmp		; enable clock change
 		out CLKPR, z0		; prescaler 1
