@@ -11,6 +11,8 @@
 fill_num_buff_addr:
 		clr ZH
 		ldi ZL, low(buff_addr)
+		ldi, itmp, low(symdron << 1)	; bitmap
+		st Z+, itmp
 		ldi itmp, low(symspc << 1)		; space
 		st Z, itmp
 		mov itmp, voltage	; number to convert
@@ -63,7 +65,7 @@ fill_num_buff_data:
 		ldi YL, low(buff_data)
 		clr YH
 		clr ZH
-		ldi itmp1, 4	; bytes to copy
+		ldi itmp1, 5	; bytes to copy
 cpybuff:ld ZL, X+
 		add ZL, sym_line_nr		; go to current line in char bitmap
 		lpm	itmp, Z
@@ -73,11 +75,11 @@ cpybuff:ld ZL, X+
 		ret
 		
 
-; Here we come every time when Horisontal sync is come.
+; Here we come every time when Horizontal sync is came.
 ; Per Datasheet it is good to use leading edge of the signal (falling)
 ; we come here only when new TV line is started. 
 ; So, we need to check VSOUT pin here to see, when new page will begin
-; CSOUT: -----+_+-----+_+-----+_+-----+_+-----+_+-----+_+
+; HSOUT: -----+_+-----+_+-----+_+-----+_+-----+_+-----+_+
 ; VSOUT: ---------------------+___________________+------
 EXT_INT0:
 		in r_sreg, SREG
@@ -118,15 +120,18 @@ EXT_INT0:
 tmrcpl1:dec	itmp
 		brne tmrcpl1
 		; now time to start printing
-		ldi ZL, low(buff_data)
-		clr ZH
-		ldi itmp1, 4
-		clr itmp2
-tmrcpl2:ld itmp, Z+
+		ldi XL, low(buff_data)		; Characted bits (updated for every line
+		clr XH
+		ldi itmp1, 5	; 5 characters to print
+		clr itmp2		; bitmap line
+		ld itmp, X+		; get line of the first symbol 
+		; we have symbols with variable width (bitmap is 8 bits, dot is 2 bits. Other symbols 5 bits)
+		; first symbol is a bitmap, so print full at the first iteration
+		
 		; print one char line (about 3us)		
 		; itmp has bits for line of symbol
 		; ### START OF TV OUT ###
-		bst itmp,7				;1
+TV_bmp:	bst itmp,7				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
@@ -138,7 +143,7 @@ tmrcpl2:ld itmp, Z+
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
-		bst itmp,4				;1
+TV_sym:	bst itmp,4				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
@@ -146,18 +151,32 @@ tmrcpl2:ld itmp, Z+
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
-		;bst itmp,2				;1
-		;bld itmp2,VIDEO_PIN		;1 
-		;out PORTB, itmp2		;1
+		bst itmp,2				;1
+		bld itmp2,VIDEO_PIN		;1 
+		out PORTB, itmp2		;1
 
-		clt						;1 clear last bit if was set
-		bld itmp2,VIDEO_PIN		;1
-		out PORTB,itmp2			;1
+TV_dot:	bst itmp,1				;1
+		bld itmp2,VIDEO_PIN		;1 
+		out PORTB, itmp2		;1
 
-		dec	itmp1
-		brne tmrcpl2
-		; ### END OF TV OUT ###
+		bst itmp,0				;1
+		bld itmp2,VIDEO_PIN		;1 
+		out PORTB, itmp2		;1
+
+		ld itmp, X+				;2 get line for the next symbol 
+		;clt						;1 clear last bit if was set
+		;bld itmp2,VIDEO_PIN		;1
+		out PORTB,z0			;1 clear last bit if was set
+
 		
+		dec	itmp1				;1
+		breq TVprnExit			;1/2
+		cpi itmp1, 2			;1 - if not dot, then print symbol
+		brne TV_sym				;1/2
+		rjmp TV_dot				;2
+		
+		; ### END OF TV OUT ###
+TVprnExit:		
 		sbi	PORTB, CONF_PIN		; restore back pullup for Configure pin
 		dec sym_H_cntr
 		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0

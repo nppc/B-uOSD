@@ -14,8 +14,6 @@
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
 										
-.EQU	SYM_HEIGHT 				= 12 	;(last zero is padding byte)
-
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
 .EQU	CONF_PIN	= PB0	; Pin for device Configuration
@@ -31,23 +29,24 @@
 .def	itmp		=	r18	; variables to use in interrupts
 .def	itmp1		=	r19	; variables to use in interrupts
 .def	itmp2		=	r4	; variables to use in interrupts
+.def	itmp3		=	r5	; variables to use in interrupts
 .def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
-.def	sym_line_nr	=	r5 	; line number of printed text (0 based)
+.def	sym_line_nr	=	r6 	; line number of printed text (0 based)
 .def	sym_H_cntr	=	r21	; counter for symbol stretching
 ;						r22
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
-.def	adc_cntr	=	r6	; counter for ADC readings
-.def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
-.def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
+.def	adc_cntr	=	r7	; counter for ADC readings
+.def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
+.def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 
 .DSEG
 .ORG 0x60
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
-buff_addr:		.BYTE 4
-buff_data:		.BYTE 4
+buff_addr:		.BYTE 5	; We have 5 symbols to print
+buff_data:		.BYTE 5	; We have 5 symbols to print
 TV_line_start:	.BYTE 2	; Line number where we start print data (from EEPROM)
 TV_col_start:	.BYTE 1	; Column number where to start print data (from EEPROM). 
 						; 10 equals about 3us.

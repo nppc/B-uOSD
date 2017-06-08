@@ -1,7 +1,7 @@
 ;DELAY_COUNT is used in delay loop 
 ;pure cycles necessary per bit
 .equ	DELAY_C = CRYSTAL_FREQ / BAUD			
-.equ 	DELAY_COUNT	= (DELAY_C - 23) / 6	; this is more correct
+.equ 	DELAY_COUNT	= (DELAY_C - 23) / 6
 
 ; throw error if we're out of bounds
 .if DELAY_COUNT > 255
@@ -76,7 +76,7 @@ Cm_LB:	rcall UART_get_byte
 		;  Cnnn - Set TV column number for printed text
 		;  Vnnn - Battery voltage correction
 		;  RRRR - Reset to Factory settings
-		;  TTTT - Test settings (show OSD for 5 seconds)
+		;  TTTT - Test settings (show OSD for 4 seconds)
 		ldi ZL, low(buff_data)
 		clr ZH
 		ld tmp, Z+
@@ -227,4 +227,5 @@ EnableTVout4sec:
 wt4s:	cp adc_cntr, z0
 		breq wt4s
 		cli							; Disable TVout
+		rcall WDT_off				; disable watchog
 		ret
