@@ -20,8 +20,6 @@
 .EQU	OVERCLOCK_VAL	= 16		; How much to add to OSCCAL for overclocking (8 seems safe value)
 									; 8 is about 10.4mhz.
 									; 16 is about 11.5mhz.
-.EQU	CRYSTAL_FREQ 	= 9600000	; in Hz (9.6mhz). Leave this freq unchanged, because it needed for calculating baudrate delays. 
-									; Serial operations allways run at 9.6mhz.
 .EQU	BAUD 		 	= 19200 	; bps
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
@@ -63,6 +61,7 @@
 .def	adc_cntr	=	r6	; counter for ADC readings
 .def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
 .def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
+.def	OSCCAL_nom	=	r9	; preserve here Factory value for nominal freq
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 
 .DSEG
@@ -114,7 +113,8 @@ RESET:
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
 		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
-
+		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
+		
 		; change speed (ensure 9.6 mhz ossc)
 		ldi tmp, 1<<CLKPCE	
 		out CLKPR, tmp		; enable clock change
@@ -155,16 +155,14 @@ RESET:
 		ldi tmp, 1<<VBAT_PIN
 		out DIDR0, tmp
 		
-		ldi voltage, 126	; for debug
-
 		sei ; Enable interrupts
 
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
 
 		; read ADSC bit to see if conversion finished
-		;sbis ADCSRA, ADSC
-		;rcall ReadVoltage
+		sbis ADCSRA, ADSC
+		rcall ReadVoltage
 		
 		; Do we need to enter Configure mode?
 		sbis PINB, CONF_PIN
@@ -174,25 +172,29 @@ main_loop:
 		
 
 OverclockMCU:
-		; overclock cpu from 9.6mhz to 10.4mhz (9% is safe margin. Going higher will corrupt EEPROM writes.)
+		; overclock cpu from 9.6mhz
 		; need to do it slowly
-		; it is only 8 OSCCAL units
 		ldi tmp, OVERCLOCK_VAL
 		in tmp1, OSCCAL
+		cp tmp1, OSCCAL_nom
+		brne OSC_up_exit	; already overclocked
 OSC_up:	inc tmp1
 		out OSCCAL, tmp1
 		dec tmp
 		brne OSC_up
+OSC_up_exit:
 		ret
 		
 SlowdownMCU:
-		; slowdown CPU from 10.4mhz to 9.6mhz (for safe EEPROM writes.)
+		; slowdown CPU to 9.6mhz (for safe EEPROM writes and serial transmission.)
 		; need to do it slowly
-		; it is only 8 OSCCAL units
 		ldi tmp, OVERCLOCK_VAL
 		in tmp1, OSCCAL
+		cp tmp1, OSCCAL_nom
+		breq OSC_dn_exit	; already slow
 OSC_dn:	dec tmp1
 		out OSCCAL, tmp1
 		dec tmp
 		brne OSC_dn
+OSC_dn_exit:
 		ret

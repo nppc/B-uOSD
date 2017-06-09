@@ -18,6 +18,8 @@
 
 
 
+.EQU	CRYSTAL_FREQ 	= 9600000	; in Hz (9.6mhz). Leave this freq unchanged, because it needed for calculating baudrate delays. 
+									; Serial operations allways run at 9.6mhz.
 ;DELAY_COUNT is used in delay loop 
 ;pure cycles necessary per bit
 .equ	DELAY_C = CRYSTAL_FREQ / BAUD			
@@ -71,6 +73,8 @@ UART_delay1:
 	
 EnterCommandMode:
 		cli	; disable interrupts (no TVout) due to critical timing on UART transmission
+		rcall SlowdownMCU ; get back to nominal freq
+
 		; We first receive 0x55, to enable Serial
 		; wait until port stabilize (all 0x55 char is received)
 		rcall SA_Wait_Transfer_Compelted
@@ -117,6 +121,7 @@ Cm_LB:	rcall UART_get_byte
 
 
 Cm_Exit:	; exit from command mode
+		rcall OverclockMCU ; get back to insane speed
 		sei		; enable TVout
 		ret
 
@@ -241,6 +246,7 @@ wfs_exit:
 		ret
 
 EnableTVout4sec:
+		rcall OverclockMCU ; get to insane speed
 		rcall WDT_Start_4s			; start WDT in interrupt mode
 		clr adc_cntr
 		sei							; Enable TVout
