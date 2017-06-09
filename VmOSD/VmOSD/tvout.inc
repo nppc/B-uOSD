@@ -26,6 +26,7 @@ fill_num_buff_addr:
 		ldi itmp, low(symgoog << 1)	; bitmap
 		st Z+, itmp
 		ldi itmp, low(symspc << 1)		; space
+		st Z+, itmp
 		st Z, itmp
 		mov itmp, voltage	; number to convert
 		ldi itmp1, 100
@@ -77,7 +78,7 @@ fill_num_buff_data:
 		ldi YL, low(buff_data)
 		clr YH
 		clr ZH
-		ldi itmp1, 5	; bytes to copy
+		ldi itmp1, 6	; bytes to copy
 cpybuff:ld ZL, X+
 		add ZL, sym_line_nr		; go to current line in char bitmap
 		lpm	itmp, Z
@@ -134,7 +135,7 @@ tmrcpl1:dec	itmp
 		; now time to start printing
 		ldi XL, low(buff_data)		; Characted bits (updated for every line
 		clr XH
-		ldi itmp1, 5	; 5 characters to print
+		ldi itmp1, 6	; 5 characters to print
 		clr itmp2		; bitmap line
 		ld itmp, X+		; get line of the first symbol 
 		; we have symbols with variable width (bitmap is 8 bits, dot is 2 bits. Other symbols 5 bits)

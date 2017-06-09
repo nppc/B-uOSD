@@ -17,8 +17,11 @@
  */
 
 ; at 9.6mhz, 10 cycles = 1us
-.EQU	OVERCLOCK_VAL	= 16			; How much to add to OSCCAL for overclocking (8 seems safe value)
-.EQU	CRYSTAL_FREQ 	= 11500000	;9600000	; in Hz (11.5mhz)
+.EQU	OVERCLOCK_VAL	= 16		; How much to add to OSCCAL for overclocking (8 seems safe value)
+									; 8 is about 10.4mhz.
+									; 16 is about 11.5mhz.
+.EQU	CRYSTAL_FREQ 	= 9600000	; in Hz (9.6mhz). Leave this freq unchanged, because it needed for calculating baudrate delays. 
+									; Serial operations allways run at 9.6mhz.
 .EQU	BAUD 		 	= 19200 	; bps
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
@@ -28,7 +31,9 @@
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
 .EQU	FIRST_PRINT_TV_COLUMN 	= 130	; Column where we start to print
-.EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v and resistor values is from divider (15K/1K)
+.EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 
+										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
+										; and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
@@ -63,8 +68,8 @@
 .DSEG
 .ORG 0x60
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
-buff_addr:		.BYTE 5	; We have 5 symbols to print
-buff_data:		.BYTE 5	; We have 5 symbols to print
+buff_addr:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+buff_data:		.BYTE 6	; We have 6 symbols to print
 TV_line_start:	.BYTE 2	; Line number where we start print data (Configurable)
 TV_col_start:	.BYTE 1	; Column number where to start print data (Configurable). 
 						; 10 equals about 3us.

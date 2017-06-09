@@ -34,8 +34,8 @@ Every command has 4 characters
 - **RRRR** - Restore Factory settings and reboot device.
 - **TTTT** - Show OSD on screen for 4 seconds in Configuration mode.
 - **Lnnn** - Set the *line* where voltage will be printed. nnn number in format 000. Useful range is about 050 to 250.
-- **Cnnn** - Set the *column* where voltage will be printed. nnn number in format 000. Useful range is about 010 to 100.
-- **Vsnn** - Adjust voltage and exit from Configuration mode. You can adjust it if OSD battery voltage is a bit different from real battery voltage. snn number in format [sign]00. In place of [sign] can be used '-' or '0' indicating sign of number. Useful range is -99 to 099. 1=100mV (if you enter -5, OSD voltage will be reduced for 500mV. 
+- **Cnnn** - Set the *column* where voltage will be printed. nnn number in format 000. Useful range is about 010 to 200.
+- **Vsnn** - Adjust voltage and exit from Configuration mode. You can adjust it if OSD battery voltage is a bit different from real battery voltage. snn number in format [sign]00. In place of [sign] can be used '-' or '0' indicating sign of number. Useful range is -99 to 099. 1=100mV (if you enter V-05, OSD voltage will be reduced for 500mV). 
 
 
 
