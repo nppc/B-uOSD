@@ -28,14 +28,14 @@
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 130	; Column where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 120	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
-.EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
+.EQU	LOW_BAT_VOLTAGE			= 40	; means 10.5 volts
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -134,15 +134,8 @@ RESET:
 		
 		rcall EEPROM_read_settings
 		
-		;ldi tmp, low(FIRST_PRINT_TV_LINE)
-		;ldi tmp1, high(FIRST_PRINT_TV_LINE)
-		;sts TV_line_start, tmp
-		;sts TV_line_start+1, tmp1
-		;ldi tmp, low(FIRST_PRINT_TV_COLUMN)
-		;sts TV_col_start, tmp
-
 		;initialize INT0 
-		; INT0 - VIDEO Sync
+		; INT0 - H VIDEO Sync
 		ldi tmp, 1<<ISC01 | 1<<ISC00	; falling edge
 		out MCUCR, tmp
 		ldi tmp, 1<<INT0 
@@ -173,34 +166,33 @@ main_loop:
 		; Do we need to enter Configure mode?
 		sbis PINB, CONF_PIN
 		rcall EnterCommandMode
-		
+		;sleep
+		;ldi voltage, 126
+		;nop
 		rjmp main_loop				
 		
 
 OverclockMCU:
 		; overclock cpu from 9.6mhz
 		; need to do it slowly
+		in tmp2, OSCCAL
+		cp tmp2, OSCCAL_nom
+		brne OSC_exit	; already overclocked
+		ldi tmp1, 1			; increment
+OSC_gen:
 		ldi tmp, OVERCLOCK_VAL
-		in tmp1, OSCCAL
-		cp tmp1, OSCCAL_nom
-		brne OSC_up_exit	; already overclocked
-OSC_up:	inc tmp1
-		out OSCCAL, tmp1
+OSC_up:	add tmp2, tmp1
+		out OSCCAL, tmp2
 		dec tmp
 		brne OSC_up
-OSC_up_exit:
+OSC_exit:
 		ret
 		
 SlowdownMCU:
 		; slowdown CPU to 9.6mhz (for safe EEPROM writes and serial transmission.)
 		; need to do it slowly
-		ldi tmp, OVERCLOCK_VAL
-		in tmp1, OSCCAL
-		cp tmp1, OSCCAL_nom
-		breq OSC_dn_exit	; already slow
-OSC_dn:	dec tmp1
-		out OSCCAL, tmp1
-		dec tmp
-		brne OSC_dn
-OSC_dn_exit:
-		ret
+		in tmp2, OSCCAL
+		cp tmp2, OSCCAL_nom
+		breq OSC_exit	; already slow
+		ldi tmp1, 255
+		rjmp OSC_gen

@@ -23,13 +23,13 @@
 fill_num_buff_addr:
 		clr ZH
 		ldi ZL, low(buff_addr)
-		ldi itmp, low(symgoog << 1)	; bitmap
+		ldi itmp, low(symdron << 1)	; bitmap
 		st Z+, itmp
 		ldi itmp, low(symspc << 1)		; space
 		st Z+, itmp
-		st Z, itmp
+		st Z+, itmp
 		; check for low-bat blinking
-		sbrs lowbat_cntr, 4	; check bit in running number if bit toggle, then we toggle voltage output
+		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
 		rjmp clr_buff		; fill buff with spaces
 		mov itmp, voltage	; number to convert
 		ldi itmp1, 100
@@ -37,6 +37,7 @@ fill_num_buff_addr:
 		cp itmp2, z0	;	remove leading zero
 		breq clear0
 		rcall conv_bcd_to_address
+		sbiw ZH:ZL,1
 		st Z+, itmp2
 clear0:	ldi itmp1, 10
 		rcall conv_d_bcd
@@ -56,7 +57,7 @@ Lbcd:	cp itmp, itmp1
 		sub itmp, itmp1
 		rjmp Lbcd
 clr_buff:
-		st Z+, itmp
+		;st Z+, itmp
 		st Z+, itmp
 		st Z+, itmp
 		st Z+, itmp

@@ -59,8 +59,8 @@ adc_3:	; now we have reminder in adc_sumL. Lets add it to the final result
 		inc tmp2	; add 1 (actually it is 0.1) to the result if reminder is 0.5 or greather
 adc_4:	;apply voltage adjustment
 		;**** DEBUG ****
-		ldi tmp, 126	; for debug
-		mov tmp2, tmp
+		;ldi tmp, 126	; for debug
+		;mov tmp2, tmp
 		;**** END OF DEBUG ****
 		lds tmp, Bat_correction
 		add tmp2, tmp
@@ -68,9 +68,11 @@ adc_4:	;apply voltage adjustment
 		mov voltage, tmp2	; now we have beautiful result for printing
 		; check for low-voltage
 		lds tmp, Bat_low_volt
-		cp tmp, voltage
-		brlo adc_exit
-		dec lowbat_cntr		; start low-bat blink
+		cp voltage, tmp 
+		brsh adc_exit
+		cpi lowbat_cntr, 255
+		brne adc_exit
+		ldi lowbat_cntr, 254		; start low-bat blink
 adc_exit:
 		ret
 				

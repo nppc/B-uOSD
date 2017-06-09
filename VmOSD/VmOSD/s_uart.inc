@@ -99,7 +99,8 @@ Cm_LB:	rcall UART_get_byte
 		;  Lnnn - Set start TV line number for printed text
 		;  Cnnn - Set TV column number for printed text
 		;  Vnnn - Battery voltage correction
-		;  RRRR - Reset to Factory settings
+		;  Wnnn - Low Battery voltage
+		;  FFFF - Reset to Factory settings
 		;  TTTT - Test settings (show OSD for 4 seconds)
 		ldi ZL, low(buff_data)
 		clr ZH
@@ -114,28 +115,45 @@ Cm_LB:	rcall UART_get_byte
 		breq Cm_TVColumn
 		cpi tmp, 'V'
 		breq Cm_Battery
-		cpi tmp, 'R'
+		cpi tmp, 'F'
 		breq Cm_Factory_reset
 		cpi tmp, 'T'
-		breq Cm_Show_OSD
-
-
+		breq EnableTVout4sec
+		cpi tmp, 'W'
+		breq Cm_Low_Bat
 Cm_Exit:	; exit from command mode
 		rcall OverclockMCU ; get back to insane speed
 		sei		; enable TVout
 		ret
 
+EnableTVout4sec:
+		rcall OverclockMCU ; get to insane speed
+		rcall WDT_Start_4s			; start WDT in interrupt mode
+		clr adc_cntr
+		sei							; Enable TVout
+wt4s:	cp adc_cntr, z0
+		breq wt4s
+		cli							; Disable TVout
+		rcall WDT_off				; disable watchog
+		rjmp EnterCommandMode		; go back to Command Mode
+
 Cm_Save:
 		; save all data to EEPROM and exit
 		; because this is very sensitive operation, lets double check it. Check remaining buffer for 'SSS'
-		ldi tmp1, 3
-Cm_SL1:	ld tmp, Z+
-		cpi tmp, 'S'
-		brne EnterCommandMode		; Seems command is not 'SSSS' go back to command mode. Save nothing to EEPROM
-		dec tmp1
-		brne Cm_SL1
+		rcall Cm_exact_cmd
+		brne EnterCommandMode
+
 		rcall EEPROM_store_settings
 		rjmp Cm_Exit
+
+Cm_Factory_reset:
+		; because this is very sensitive operation, lets double check it. Check remaining buffer for 'RRR'
+		rcall Cm_exact_cmd
+		brne EnterCommandMode
+		rcall EE_Reset_factory
+		; initiate a reset
+		rcall WDT_Start_16ms
+Cm_Fr2:	rjmp Cm_Fr2					; wait until WDT reset
 
 Cm_TVLine:
 		rcall Cm_ConvertBCD16bit
@@ -169,23 +187,21 @@ Cm_Bneg:
 		sts Bat_correction, adc_sumL
 		rjmp Cm_Exit	; Here we exit because to see effect of voltage correction we can only if ADC is read and recalculated in main loop
 		
-Cm_Factory_reset:
-		; because this is very sensitive operation, lets double check it. Check remaining buffer for 'RRR'
+Cm_exact_cmd:
 		ldi tmp1, 3
-Cm_Fr1:	ld tmp, Z+
-		cpi tmp, 'R'
-		brne Cm_Fr3			; Seems command is not 'RRRR' go back to command mode. Save nothing to EEPROM
+Cm_Fr1:	ld tmp2, Z+
+		cp tmp2, tmp		; compare with first char
+		brne Cm_Fr3			; Seems command is not 'FFFF' or 'SSSS' go back to command mode. Save nothing to EEPROM
 		dec tmp1
 		brne Cm_Fr1
-		rcall EE_Reset_factory
-		; initiate a reset
-		rcall WDT_Start_16ms
-Cm_Fr2:	rjmp Cm_Fr2					; wait until WDT reset
-Cm_Fr3:	rjmp EnterCommandMode		; relative branch is too long...
+Cm_Fr3:	ret
 
-Cm_Show_OSD:
-		rjmp EnableTVout4sec
-		
+
+Cm_Low_Bat:
+		rcall Cm_ConvertBCD16bit
+		; now we have a number in adc_sumL:adc_sumH
+		sts Bat_low_volt, adc_sumL
+		rjmp Cm_Exit	; Here we exit because to see effect of voltage correction we can only if ADC is read and recalculated in main loop
 
 
 ; Convert 3 bytes from SRAM pointed by Z register to 16bit number (adc_sumL:adc_sumH)
@@ -245,13 +261,3 @@ wfs_L2:	sbis PINB, CONF_PIN
 wfs_exit:
 		ret
 
-EnableTVout4sec:
-		rcall OverclockMCU ; get to insane speed
-		rcall WDT_Start_4s			; start WDT in interrupt mode
-		clr adc_cntr
-		sei							; Enable TVout
-wt4s:	cp adc_cntr, z0
-		breq wt4s
-		cli							; Disable TVout
-		rcall WDT_off				; disable watchog
-		rjmp EnterCommandMode		; go back to Command Mode
