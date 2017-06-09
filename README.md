@@ -1,4 +1,4 @@
-# Battery voltage microOSD
+# Battery voltage microOSD V1.0
 It is very small and simple OSD for monitoring Battery voltage.
 ![Virtual PCB top](Images/PCB_Top.png)
 ![Virtual PCB bottom](Images/PCB_Bottom.png)

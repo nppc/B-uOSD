@@ -35,7 +35,7 @@
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
-.EQU	LOW_BAT_VOLTAGE			= 40	; means 10.5 volts
+.EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -167,7 +167,6 @@ main_loop:
 		sbis PINB, CONF_PIN
 		rcall EnterCommandMode
 		;sleep
-		;ldi voltage, 126
 		;nop
 		rjmp main_loop				
 		
