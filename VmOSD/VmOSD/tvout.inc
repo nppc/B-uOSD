@@ -152,11 +152,11 @@ TV_bmp:	bst itmp,7				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
-		bst itmp,5				;1
+TV_sym:	bst itmp,5				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
-TV_sym:	bst itmp,4				;1
+		bst itmp,4				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 
@@ -177,8 +177,6 @@ TV_dot:	bst itmp,1				;1
 		out PORTB, itmp2		;1
 
 		ld itmp, X+				;2 get line for the next symbol 
-		;clt						;1 clear last bit if was set
-		;bld itmp2,VIDEO_PIN		;1
 		out PORTB,z0			;1 clear last bit if was set
 
 		
