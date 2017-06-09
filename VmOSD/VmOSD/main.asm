@@ -69,6 +69,7 @@
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
 buff_addr:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_data:		.BYTE 6	; We have 6 symbols to print
+Configuration_settings:	; From here  starts SRAM, that will be preserved in EEPROM
 TV_line_start:	.BYTE 2	; Line number where we start print data (Configurable)
 TV_col_start:	.BYTE 1	; Column number where to start print data (Configurable). 
 						; 10 equals about 3us.
@@ -122,20 +123,19 @@ RESET:
 		
 		rcall WDT_off		; just in case it left on after software reset
 
-		rcall OverclockMCU
-		
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
 		; Enable pullup on Configure Pin. We will enter configure mode if this pin will go LOW (by PCINT interrupt)
 		sbi	PORTB, CONF_PIN
 		
-		; set line from where to start printing (later we store this value in EEPROM)
-		ldi tmp, low(FIRST_PRINT_TV_LINE)
-		ldi tmp1, high(FIRST_PRINT_TV_LINE)
-		sts TV_line_start, tmp
-		sts TV_line_start+1, tmp1
-		ldi tmp, low(FIRST_PRINT_TV_COLUMN)
-		sts TV_col_start, tmp
+		rcall EEPROM_read_settings
+		
+		;ldi tmp, low(FIRST_PRINT_TV_LINE)
+		;ldi tmp1, high(FIRST_PRINT_TV_LINE)
+		;sts TV_line_start, tmp
+		;sts TV_line_start+1, tmp1
+		;ldi tmp, low(FIRST_PRINT_TV_COLUMN)
+		;sts TV_col_start, tmp
 
 		;initialize INT0 
 		; INT0 - VIDEO Sync
@@ -155,6 +155,8 @@ RESET:
 		ldi tmp, 1<<VBAT_PIN
 		out DIDR0, tmp
 		
+		rcall OverclockMCU
+
 		sei ; Enable interrupts
 
 main_loop:

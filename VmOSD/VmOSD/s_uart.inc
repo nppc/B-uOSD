@@ -134,7 +134,7 @@ Cm_SL1:	ld tmp, Z+
 		brne EnterCommandMode		; Seems command is not 'SSSS' go back to command mode. Save nothing to EEPROM
 		dec tmp1
 		brne Cm_SL1
-		; TODO EEPROM save
+		rcall EEPROM_store_settings
 		rjmp Cm_Exit
 
 Cm_TVLine:

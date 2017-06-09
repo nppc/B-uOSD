@@ -62,3 +62,38 @@ EE_RstL1:
 		cpi tmp1, EEPROM_Start+4 	; 4 bytes to restore
 		brne EE_RstL1
 		ret
+		
+		
+; Write SRAM settings to the EEPROM
+; We just copy piece of SRAM to EEPROM
+EEPROM_store_settings:
+		ldi, ZL, low(Configuration_settings)
+		clr ZH
+		ldi tmp1, EEPROM_Start
+EE_ss:	ld tmp, Z+	
+		rcall EEPROM_write
+		inc tmp1			; EEPROM_address++
+		cpi ZL, Configuration_settings + 4	; Are all 4 bytes of data is written to EEPROM?
+		brlo EE_ss
+		ret
+		
+; Read EEPROM settings to SRAM
+; We just copy piece of EEPROM to SRAM
+EEPROM_read_settings:
+EE_cv:	ldi, ZL, low(Configuration_settings)
+		clr ZH
+		ldi tmp1, EEPROM_Start
+EE_rs:	rcall EEPROM_read
+		st Z+, tmp
+		inc tmp1			; EEPROM_address++
+		cpi ZL, Configuration_settings + 4	; Are all 4 bytes of data is written to EEPROM?
+		brlo EE_rs
+		; check, do we have valid data?
+		lds tmp, TV_col_start
+		cpi tmp, 0xFF
+		brne EE_rext	; data is ok
+		; we need to reset data
+		rcall EE_Reset_factory
+		rjmp EEPROM_read_settings	; read data again
+EE_rext:
+		ret
