@@ -24,8 +24,9 @@
 ; tmp1 is address
 EEPROM_read:
 		; Wait for completion of any previous operations
-		sbic EECR, EEPE
-		rjmp EEPROM_read
+		rcall EE_wrL
+		;sbic EECR, EEPE
+		;rjmp EEPROM_read
 		out EEARL, tmp1
 		; Start eeprom read
 		sbi EECR, EERE
@@ -90,7 +91,6 @@ EE_rs:	rcall EEPROM_read
 		cpi ZL, Configuration_settings + 6	; Are all 5 bytes of data is written to EEPROM?
 		brlo EE_rs
 		; check, do we have valid data?
-		;lds tmp, TV_col_start
 		cpi tmp, 0xFF		; check last setting (LOW_BAT_VOLTAGE)
 		brne EE_rext	; data is ok
 		; we need to reset data

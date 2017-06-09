@@ -17,9 +17,10 @@
  */
 
 ; at 9.6mhz, 10 cycles = 1us
-.EQU	OVERCLOCK_VAL	= 16		; How much to add to OSCCAL for overclocking (8 seems safe value)
-									; 8 is about 10.4mhz.
-									; 16 is about 11.5mhz.
+.EQU	OVERCLOCK_VAL	= 25		; How much to add to OSCCAL for overclocking (8 seems safe value)
+									; 8 is about 10.4 mhz.
+									; 16 is about 11.5 mhz.
+									; 25 is about 13 mhz.
 .EQU	BAUD 		 	= 19200 	; bps
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
@@ -145,8 +146,8 @@ RESET:
 		; Internal 1.1Vref, ADC channel, 10bit ADC result
 		ldi tmp, 1<<REFS0 | 1<<MUX0 | 1<<MUX1
 		out ADMUX, tmp
-		; normal mode (single conversion mode), 64 prescaler (about 150khz at 9.6mhz ossc).
-		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 0<<ADPS0
+		; normal mode (single conversion mode), 128 prescaler (about 75khz at 9.6mhz ossc).
+		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 1<<ADPS0
 		out ADCSRA, tmp
 		; turn off digital circuity in analog pin
 		ldi tmp, 1<<VBAT_PIN
