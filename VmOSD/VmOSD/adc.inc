@@ -66,6 +66,11 @@ adc_4:	;apply voltage adjustment
 		add tmp2, tmp
 		; return voltage for OSD 
 		mov voltage, tmp2	; now we have beautiful result for printing
+		; check for low-voltage
+		lds tmp, Bat_low_volt
+		cp tmp, voltage
+		brlo adc_exit
+		dec lowbat_cntr		; start low-bat blink
 adc_exit:
 		ret
 				

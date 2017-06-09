@@ -28,6 +28,9 @@ fill_num_buff_addr:
 		ldi itmp, low(symspc << 1)		; space
 		st Z+, itmp
 		st Z, itmp
+		; check for low-bat blinking
+		sbrs lowbat_cntr, 4	; check bit in running number if bit toggle, then we toggle voltage output
+		rjmp clr_buff		; fill buff with spaces
 		mov itmp, voltage	; number to convert
 		ldi itmp1, 100
 		rcall conv_d_bcd
@@ -52,6 +55,12 @@ Lbcd:	cp itmp, itmp1
 		inc itmp2
 		sub itmp, itmp1
 		rjmp Lbcd
+clr_buff:
+		st Z+, itmp
+		st Z+, itmp
+		st Z+, itmp
+		st Z+, itmp
+		rjmp exitbcd
 
 
 ; this routine is called from interrupts, so use interrupt registers
@@ -204,6 +213,10 @@ vsout_newpage:
 		clr TV_lineL
 		clr TV_lineH
 		ldi sym_H_cntr, SYMBOL_STRETCH
-		rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
+		; counter for low-bat
+		cpi lowbat_cntr, 255
+		breq vsonb
+		dec lowbat_cntr
+vsonb:	rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
 		rjmp pcint_exit				; exit
 

@@ -17,7 +17,8 @@
  */
 
  Factory_data:	.DW FIRST_PRINT_TV_LINE			; TV Line to print 
-				.DB FIRST_PRINT_TV_COLUMN, 0		; TV Col to print and voltage offset
+				.DB FIRST_PRINT_TV_COLUMN, 0	; TV Col to print and voltage offset
+				.DB LOW_BAT_VOLTAGE, 0 			; last 0 is padding byte - no meaning
 
 ; tmp is value
 ; tmp1 is address
@@ -59,7 +60,7 @@ EE_RstL1:
 		lpm tmp, Z+
 		rcall EEPROM_write
 		inc tmp1
-		cpi tmp1, EEPROM_Start+4 	; 4 bytes to restore
+		cpi tmp1, EEPROM_Start+5 	; 5 bytes to restore
 		brne EE_RstL1
 		ret
 		
@@ -73,7 +74,7 @@ EEPROM_store_settings:
 EE_ss:	ld tmp, Z+	
 		rcall EEPROM_write
 		inc tmp1			; EEPROM_address++
-		cpi ZL, Configuration_settings + 4	; Are all 4 bytes of data is written to EEPROM?
+		cpi ZL, Configuration_settings + 5	; Are all 5 bytes of data is written to EEPROM?
 		brlo EE_ss
 		ret
 		
@@ -86,11 +87,11 @@ EE_cv:	ldi, ZL, low(Configuration_settings)
 EE_rs:	rcall EEPROM_read
 		st Z+, tmp
 		inc tmp1			; EEPROM_address++
-		cpi ZL, Configuration_settings + 4	; Are all 4 bytes of data is written to EEPROM?
+		cpi ZL, Configuration_settings + 5	; Are all 5 bytes of data is written to EEPROM?
 		brlo EE_rs
 		; check, do we have valid data?
-		lds tmp, TV_col_start
-		cpi tmp, 0xFF
+		;lds tmp, TV_col_start
+		cpi tmp, 0xFF		; check last setting (LOW_BAT_VOLTAGE)
 		brne EE_rext	; data is ok
 		; we need to reset data
 		rcall EE_Reset_factory

@@ -35,6 +35,7 @@
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
+.EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -54,7 +55,7 @@
 .def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
 .def	sym_line_nr	=	r5 	; line number of printed text (0 based)
 .def	sym_H_cntr	=	r21	; counter for symbol stretching
-;						r22
+.def	lowbat_cntr	=	r22	; counter for blinking voltage when it gets low
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
@@ -75,6 +76,7 @@ TV_col_start:	.BYTE 1	; Column number where to start print data (Configurable).
 						; 10 equals about 3us.
 						; useful range about 1-100
 Bat_correction:	.BYTE 1 ; signed value in mV (1=100mV) for correcting analog readings (Configurable).
+Bat_low_volt:	.BYTE 1 ; value in mV (1=100mV) for signalling low voltage.
 
 .ESEG
 .ORG 5				; It is good practice do not use first bytes of EEPROM to prevet its corruption
@@ -82,6 +84,7 @@ EEPROM_Start:
 EE_TV_line_start:	.BYTE 2
 EE_TV_col_start:	.BYTE 1
 EE_Bat_correction:	.BYTE 1 
+EE_Bat_low_volt:	.BYTE 1
 
 .CSEG
 .ORG 0
@@ -113,6 +116,7 @@ RESET:
 		inc z1
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
+		ldi lowbat_cntr, 255	; No blink 
 		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
 		
