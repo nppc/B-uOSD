@@ -50,7 +50,7 @@ WDT_off:
 		
 ;Watchdog interrupt routine here
 WATCHDOG:
-		in r_sreg, SREG
+		;in r_sreg, SREG
 		mov adc_cntr,z1		; just update adc variable, because WDT only enabled in Command mode, so, no ADC readings occur
-		out SREG, r_sreg	
+		;out SREG, r_sreg	
 		reti

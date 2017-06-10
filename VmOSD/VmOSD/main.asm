@@ -17,7 +17,7 @@
  */
 
 ; at 9.6mhz, 10 cycles = 1us
-.EQU	OVERCLOCK_VAL	= 25		; How much to add to OSCCAL for overclocking (8 seems safe value)
+.EQU	OVERCLOCK_VAL	= 20		; How much to add to OSCCAL for overclocking (8 seems safe value)
 									; 8 is about 10.4 mhz.
 									; 16 is about 11.5 mhz.
 									; 25 is about 13 mhz.
@@ -29,14 +29,14 @@
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 120	; Column where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 100	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
-.EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
+.EQU	LOW_BAT_VOLTAGE			= 40	; means 10.5 volts
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -137,7 +137,7 @@ RESET:
 		
 		;initialize INT0 
 		; INT0 - H VIDEO Sync
-		ldi tmp, 1<<ISC01 | 1<<ISC00	; falling edge
+		ldi tmp, 1<<ISC01 | 1<<ISC00 | 1<<SE	; falling edge, sleep mode enable
 		out MCUCR, tmp
 		ldi tmp, 1<<INT0 
 		out GIMSK, tmp
@@ -160,15 +160,17 @@ RESET:
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
 
-		; read ADSC bit to see if conversion finished
-		sbis ADCSRA, ADSC
-		rcall ReadVoltage
-		
+
 		; Do we need to enter Configure mode?
 		sbis PINB, CONF_PIN
 		rcall EnterCommandMode
-		;sleep
-		;nop
+		sleep
+		cpi TV_lineL, 30
+		cpc TV_lineH, z0
+		brsh main_loop		; only read adc while first non-printing TV lines
+		; read ADSC bit to see if conversion finished
+		sbis ADCSRA, ADSC
+		rcall ReadVoltage
 		rjmp main_loop				
 		
 
