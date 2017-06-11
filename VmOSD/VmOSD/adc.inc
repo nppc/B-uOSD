@@ -58,10 +58,6 @@ adc_3:	; now we have reminder in adc_sumL. Lets add it to the final result
 		brlo adc_4
 		inc tmp2	; add 1 (actually it is 0.1) to the result if reminder is 0.5 or greather
 adc_4:	;apply voltage adjustment
-		;**** DEBUG ****
-		;ldi tmp, 126	; for debug
-		;mov tmp2, tmp
-		;**** END OF DEBUG ****
 		lds tmp, Bat_correction
 		add tmp2, tmp
 		; return voltage for OSD 

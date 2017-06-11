@@ -16,27 +16,32 @@
  * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-; at 9.6mhz, 10 cycles = 1us
-.EQU	OVERCLOCK_VAL	= 20		; How much to add to OSCCAL for overclocking (8 seems safe value)
+;#define SYMBOL_NORMAL ; 6bit wide
+#define SYMBOL_DOUBLE ; double height font (7bit)
+
+#define BITMAP_COPTER
+;#define BITMAP_GOOGLES
+ 
+ ; at 9.6mhz, 10 cycles = 1us
+.EQU	OVERCLOCK_VAL	= 24		; How much to add to OSCCAL for overclocking
 									; 8 is about 10.4 mhz.
 									; 16 is about 11.5 mhz.
-									; 25 is about 13 mhz.
+									; 24 is about 13 mhz.
 .EQU	BAUD 		 	= 19200 	; bps
-.EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
 
-; PAL visible dots in 51.9us (498 cycles) or 166 dots
+; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
 .EQU	FIRST_PRINT_TV_COLUMN 	= 100	; Column where we start to print
-.EQU	VOLT_DIV_CONST			= 186	; To get this number use formula: 
+.EQU	VOLT_DIV_CONST			= 186	; To get this number use formula (for 4S max): 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
-.EQU	LOW_BAT_VOLTAGE			= 40	; means 10.5 volts
+.EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -60,11 +65,11 @@
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
+; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 .def	adc_cntr	=	r6	; counter for ADC readings
 .def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
 .def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
 .def	OSCCAL_nom	=	r9	; preserve here Factory value for nominal freq
-; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 
 .DSEG
 .ORG 0x60
@@ -165,7 +170,7 @@ main_loop:
 		sbis PINB, CONF_PIN
 		rcall EnterCommandMode
 		sleep
-		cpi TV_lineL, 30
+		cpi TV_lineL, 30		; first 30 lines is non-printing lines. Timing there is not critical
 		cpc TV_lineH, z0
 		brsh main_loop		; only read adc while first non-printing TV lines
 		; read ADSC bit to see if conversion finished

@@ -17,53 +17,6 @@
  */
 
 
-	
-; this routine is called from interrupts, so use interrupt registers
-; voltage is input parameter	
-fill_num_buff_addr:
-		clr ZH
-		ldi ZL, low(buff_addr)
-		ldi itmp, low(symdron << 1)	; bitmap
-		st Z+, itmp
-		ldi itmp, low(symspc << 1)		; space
-		st Z+, itmp
-		st Z+, itmp
-		; check for low-bat blinking
-		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
-		rjmp clr_buff		; fill buff with spaces
-		mov itmp, voltage	; number to convert
-		ldi itmp1, 100
-		rcall conv_d_bcd
-		cp itmp2, z0	;	remove leading zero
-		breq clear0
-		rcall conv_bcd_to_address
-		sbiw ZH:ZL,1
-		st Z+, itmp2
-clear0:	ldi itmp1, 10
-		rcall conv_d_bcd
-		rcall conv_bcd_to_address
-		st Z+, itmp2
-		ldi itmp1, low(symdot << 1)
-		st Z+, itmp1
-		mov itmp2, itmp
-		rcall conv_bcd_to_address
-		st Z, itmp2
-exitbcd:ret
-conv_d_bcd:
-		clr itmp2
-Lbcd:	cp itmp, itmp1
-		brlo exitbcd
-		inc itmp2
-		sub itmp, itmp1
-		rjmp Lbcd
-clr_buff:
-		;st Z+, itmp
-		st Z+, itmp
-		st Z+, itmp
-		st Z+, itmp
-		rjmp exitbcd
-
-
 ; this routine is called from interrupts, so use interrupt registers
 ; tmp2 contains bcd number
 ; Convert Char number to address
@@ -218,6 +171,46 @@ vsout_newpage:
 		cpi lowbat_cntr, 255
 		breq vsonb
 		dec lowbat_cntr
-vsonb:	rcall fill_num_buff_addr	; convert voltage to addresses of chars to print
+vsonb:	;convert voltage to addresses of chars to print
+		clr ZH
+		ldi ZL, low(buff_addr)
+		ldi itmp, low(symbitmap << 1)	; bitmap
+		st Z+, itmp
+		ldi itmp, low(symspc << 1)		; space
+		st Z+, itmp
+		st Z+, itmp
+		; check for low-bat blinking
+		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
+		rjmp clr_buff		; fill buff with spaces
+		mov itmp, voltage	; number to convert
+		ldi itmp1, 100
+		rcall conv_d_bcd
+		cp itmp2, z0	;	remove leading zero
+		breq clear0
+		rcall conv_bcd_to_address
+		sbiw ZH:ZL,1
+		st Z+, itmp2
+clear0:	ldi itmp1, 10
+		rcall conv_d_bcd
+		rcall conv_bcd_to_address
+		st Z+, itmp2
+		ldi itmp1, low(symdot << 1)
+		st Z+, itmp1
+		mov itmp2, itmp
+		rcall conv_bcd_to_address
+		st Z, itmp2
 		rjmp pcint_exit				; exit
+
+conv_d_bcd:
+		clr itmp2
+Lbcd:	cp itmp, itmp1
+		brlo pcint_exit
+		inc itmp2
+		sub itmp, itmp1
+		rjmp Lbcd
+clr_buff:
+		st Z+, itmp
+		st Z+, itmp
+		st Z+, itmp
+		rjmp pcint_exit
 

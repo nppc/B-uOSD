@@ -209,12 +209,10 @@ Cm_ConvertBCD16bit:
 		clr adc_sumL	; reuse adc variables for storing 16 bit number
 		clr adc_sumH	; reuse adc variables for storing 16 bit number
 		ld tmp, Z+		; read 100s of number
-		andi tmp, 0b00001111	; converd BCD to bin
 		; multiply by 100
 		ldi tmp1, 50	; multiply by 50
 		rcall Cm_multiply
 		ld tmp, Z+		; read 10s of number
-		andi tmp, 0b00001111	; converd BCD to bin
 		; multiply by 10
 		ldi tmp1, 5	; multiply by 5
 		rcall Cm_multiply
@@ -226,7 +224,8 @@ Cm_ConvertBCD16bit:
 		
 ; Multiply tmp by (tmp1/2) and add it to adc_sumL:adc_sumH
 ; we supply half of tmp1 for speed purposes (we first multiply tmp by 2)
-Cm_multiply:		
+Cm_multiply:
+		andi tmp, 0b00001111	; converd BCD to bin
 		lsl tmp	; multiply by 2 
 Cm_mul1:add adc_sumL, tmp
 		adc adc_sumH, z0

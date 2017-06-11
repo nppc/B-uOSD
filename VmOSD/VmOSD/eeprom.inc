@@ -25,8 +25,6 @@
 EEPROM_read:
 		; Wait for completion of any previous operations
 		rcall EE_wrL
-		;sbic EECR, EEPE
-		;rjmp EEPROM_read
 		out EEARL, tmp1
 		; Start eeprom read
 		sbi EECR, EERE
