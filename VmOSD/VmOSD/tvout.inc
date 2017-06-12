@@ -21,7 +21,7 @@
 conv_bcd_to_address:		
 		; use XH register just because it is free 
 		ldi XH, low(symbols << 1)	; we need only low address byte, because fonts are at the beginning of the flash
-mult1:	subi XH, -SYM_HEIGHT	; XH=XH+12
+mult1:	subi XH, -SYM_HEIGHT	; XH=XH+10
 		dec	itmp2
 		brne mult1
 		mov itmp2, XH	; return value
@@ -90,30 +90,34 @@ EXT_INT0:
 		rcall fill_num_buff_data	; 4.7us
 		; Now is the delay to set horizontal position of the text
 		lds	itmp, TV_col_start
-		; 10 iterations of this loop is about 3us.
+		; 10 iterations of this loop is about 3us at 9.6 mhz.
 tmrcpl1:dec	itmp
 		brne tmrcpl1
 		; now time to start printing
 		ldi XL, low(buff_data)		; Characted bits (updated for every line
 		clr XH
-		ldi itmp1, 6	; 5 characters to print
+		ldi itmp1, 6	; 6 characters to print
 		clr itmp2		; bitmap line
 		ld itmp, X+		; get line of the first symbol 
 		; we have symbols with variable width (bitmap is 8 bits, dot is 2 bits. Other symbols 5 bits)
 		; first symbol is a bitmap, so print full at the first iteration
 		
-		; print one char line (about 3us)		
+		; print one char line		
 		; itmp has bits for line of symbol
 		; ### START OF TV OUT ###
 TV_bmp:	bst itmp,7				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
-
+#if defined(SYMBOL_DOUBLE)
+TV_sym:	; for 7 bit numbers
+#endif
 		bst itmp,6				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
-
-TV_sym:	bst itmp,5				;1
+#if defined(SYMBOL_NORMAL)
+TV_sym: ; for 6 bit numbers
+#endif
+		bst itmp,5				;1
 		bld itmp2,VIDEO_PIN		;1 
 		out PORTB, itmp2		;1
 

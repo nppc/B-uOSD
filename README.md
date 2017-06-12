@@ -1,4 +1,4 @@
-# Battery voltage microOSD V1.0
+# Battery voltage microOSD v1.1
 It is very small and simple OSD for monitoring Battery voltage.
 ![Virtual PCB top](Images/PCB_Top.png)
 ![Virtual PCB bottom](Images/PCB_Bottom.png)
@@ -12,6 +12,7 @@ It is very small and simple OSD for monitoring Battery voltage.
 It has minuses too.
 - Very basic (only one voltage monitoring)
 - Due to small and slow mcu (no special mcu for signal generation) the OSD picture is not as stable as other bigger OSDs.
+Sample screen from v1.0
 ![Sample screenshot](Images/Sample.jpg)
 
 ## Connection
@@ -82,7 +83,6 @@ Project can be compiled with AVRASM2 (similar to avra on Linux) or with AVR Stud
 ## Flashing
 Use `avrdude` software and `USBASP` dongle for flashing microcontroller. 
 ![Connect for flashing](Images/Flashing_connections.png)
-Syntax is something like this (later will verify that):
 ```
-avrdude -p t13 -P usb -c usbasp -e -F flash:w:B-uOSD_NC_vXX.hex:i
+avrdude.exe -c usbasp -p t13 -P usb -B 4.0 -U flash:w:B-uOSD_NC_vXX.hex:a
 ```
