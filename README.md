@@ -18,9 +18,12 @@ It has minuses too.
 There is (C)onfiguration pin. BAUDRATE is 19200.
 ### Connection
 Connect to PC or tablet with any Serial2USB converter. Connect 3 wires: 
-- OSD VCC -> Serial2USB VCC
-- OSD GND -> Serial2USB GND
-- OSD C -> Serial2USB TX
+
+B-uOSD | USB2Serial
+----------- | ------------
+VCC | VCC
+GND | GND
+C | TX
 
 OSD can be connected to the video signal to see changes on screen in live.
 ### Changing configuration
@@ -38,5 +41,38 @@ Every command has 4 characters
 - **Vsnn** - Adjust voltage and exit from Configuration mode. You can adjust it if OSD battery voltage is a bit different from real battery voltage. snn number in format [sign]00. In place of [sign] can be used '-' or '0' indicating sign of number. Allowed range is -99 to 099. 1=100mV (if you enter V-05, OSD voltage will be reduced for 500mV). 
 - **Wnnn** - Set low voltage threshold. If voltage drops below this value, OSD voltage will blink. nnn number in format 000. Allowed range is 001 to 254.
 
+## Compilation
+To compile source files there is several options.
+### Under Linux (even cheap OrangePi board will work)
+Install `avra` and `git`
+```
+apt-get install avra git
+```
+Clone the project to any directory
+```
+git clone https://github.com/nppc/B-uOSD.git
+```
+Navigate to `Bin` directory
+```
+cd B-uOSD/Bin
+```
+And run `compile_linux.sh` script
+```
+./compile_linux.sh
+```
+Now you have .hex files with all possible compile variations ready to flash:
 
+File name | Options
+----------- | ------------
+B-uOSD_NC_vXX.hex | Normal font size, Copter bitmap
+B-uOSD_NG_vXX.hex | Normal font size, Googles bitmap
+B-uOSD_DC_vXX.hex | Double font size, Copter bitmap
+B-uOSD_DG_vXX.hex | Double font size, Googles bitmap
 
+## Flashing
+Uase `avrdude` for flashing microcontroller. 
+(Connection diagram will be included...)
+Syntax is something like this (later will verify that):
+```
+avrdude -p t13 -P usb -c usbasp -e -F flash:w:B-uOSD_NC_vXX.hex:i
+```
