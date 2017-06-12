@@ -1,25 +1,25 @@
-/*
- * Author of B-uOSD is Pavel Palonen
- *
- * B-uOSD is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * B-uOSD is distributed WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * this text shall be included in all
- * copies or substantial portions of the Software.
- *
- * You should have received a copy of the GNU General Public License
- * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+; * Author of B-uOSD is Pavel Palonen
+; *
+; * B-uOSD is free software: you can redistribute it and/or modify
+; * it under the terms of the GNU General Public License as published by
+; * the Free Software Foundation, either version 3 of the License, or
+; * (at your option) any later version.
+; *
+; * B-uOSD is distributed WITHOUT ANY WARRANTY; without even the implied warranty of
+; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; * GNU General Public License for more details.
+; * this text shall be included in all
+; * copies or substantial portions of the Software.
+; *
+; * You should have received a copy of the GNU General Public License
+; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+
+.include "tn13Adef.inc"
 
 ;#define SYMBOL_NORMAL ; 6bit wide
-#define SYMBOL_DOUBLE ; double height font (7bit)
+;#define SYMBOL_DOUBLE ; double height font (7bit)
 
-#define BITMAP_COPTER
+;#define BITMAP_COPTER
 ;#define BITMAP_GOOGLES
  
  ; at 9.6mhz, 10 cycles = 1us
@@ -87,10 +87,10 @@ Bat_low_volt:	.BYTE 1 ; value in mV (1=100mV) for signalling low voltage.
 .ESEG
 .ORG 5				; It is good practice do not use first bytes of EEPROM to prevet its corruption
 EEPROM_Start:
-EE_TV_line_start:	.BYTE 2
-EE_TV_col_start:	.BYTE 1
-EE_Bat_correction:	.BYTE 1 
-EE_Bat_low_volt:	.BYTE 1
+EE_TV_line_start:	.DW 0
+EE_TV_col_start:	.DB 0
+EE_Bat_correction:	.DB 0 
+EE_Bat_low_volt:	.DB 0
 
 .CSEG
 .ORG 0

@@ -1,20 +1,18 @@
-/*
- * Author of B-uOSD is Pavel Palonen
- *
- * B-uOSD is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * B-uOSD is distributed WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * this text shall be included in all
- * copies or substantial portions of the Software.
- *
- * You should have received a copy of the GNU General Public License
- * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
- */
+; * Author of B-uOSD is Pavel Palonen
+; *
+; * B-uOSD is free software: you can redistribute it and/or modify
+; * it under the terms of the GNU General Public License as published by
+; * the Free Software Foundation, either version 3 of the License, or
+; * (at your option) any later version.
+; *
+; * B-uOSD is distributed WITHOUT ANY WARRANTY; without even the implied warranty of
+; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; * GNU General Public License for more details.
+; * this text shall be included in all
+; * copies or substantial portions of the Software.
+; *
+; * You should have received a copy of the GNU General Public License
+; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
 
 .EQU	SYM_HEIGHT 				= 10
  
@@ -132,7 +130,7 @@ sym9:	.DB 0b00011110, \
 			0b00000001, \
 			0b00000011, \
 			0b00011110
-
+#endif
 
 #if defined(SYMBOL_DOUBLE)
 .EQU 	SYMBOL_STRETCH 	= 2		; copy every line of symbol SYMBOL_STRETCH times
