@@ -14,10 +14,17 @@ It has minuses too.
 - Due to small and slow mcu (no special mcu for signal generation) the OSD picture is not as stable as other bigger OSDs.
 ![Sample screenshot](Images/Sample.jpg)
 
+## Connection
+There is many possibilities to use this OSD.
+One example for 1S setup:
+![Sample connection 1S](Images/1S_Connection.jpg)
+
+*(Another example for EF-02 AIO combo camera/vtx comming...)*
+
 ## Configuration
 There is (C)onfiguration pin. BAUDRATE is 19200.
-### Connection
-Connect to PC or tablet with any Serial2USB converter. Connect 3 wires: 
+### Connection for configuring
+Connect to PC or tablet with any USB2Serial converter. Connect 3 wires: 
 
 B-uOSD | USB2Serial
 ----------- | ------------
@@ -69,9 +76,12 @@ B-uOSD_NG_vXX.hex | Normal font size, Googles bitmap
 B-uOSD_DC_vXX.hex | Double font size, Copter bitmap
 B-uOSD_DG_vXX.hex | Double font size, Googles bitmap
 
+### Under Windows
+Project can be compiled with AVRASM2 (similar to avra on Linux) or with AVR Studio.
+
 ## Flashing
-Uase `avrdude` for flashing microcontroller. 
-(Connection diagram will be included...)
+Use `avrdude` software and `USBASP` dongle for flashing microcontroller. 
+![Connect for flashing](Images/Flashing_connections.png)
 Syntax is something like this (later will verify that):
 ```
 avrdude -p t13 -P usb -c usbasp -e -F flash:w:B-uOSD_NC_vXX.hex:i
