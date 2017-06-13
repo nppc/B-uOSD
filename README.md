@@ -12,8 +12,8 @@ It is very small and simple OSD for monitoring Battery voltage.
 It has minuses too.
 - Very basic (only one voltage monitoring)
 - Due to small and slow mcu (no special mcu for signal generation) the OSD picture is not as stable as other bigger OSDs.
-Sample screen from v1.0
-![Sample screenshot](Images/Sample.jpg)
+![Sample Double height](Images/Sample_DG.jpg)
+![Sample Normal height](Images/Sample_NC.jpg)
 
 ## Connection
 There is many possibilities to use this OSD.
