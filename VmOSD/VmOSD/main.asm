@@ -158,8 +158,7 @@ RESET:
 		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 1<<ADPS0
 		out ADCSRA, tmp
 		; turn off digital circuity in analog pin
-		ldi tmp, 1<<VBAT_PIN
-		out DIDR0, tmp
+		sbi DIDR0, VBAT_PIN
 		
 		rcall OverclockMCU
 
@@ -191,10 +190,10 @@ OverclockMCU:
 		ldi tmp1, 1			; increment
 OSC_gen:
 		ldi tmp, OVERCLOCK_VAL
-OSC_up:	add tmp2, tmp1
+OSC_ch:	add tmp2, tmp1		; We can't use here inc command because this part of code used as "dec" too.
 		out OSCCAL, tmp2
 		dec tmp
-		brne OSC_up
+		brne OSC_ch
 OSC_exit:
 		ret
 		

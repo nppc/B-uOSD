@@ -26,7 +26,10 @@ mult1:	subi XH, -SYM_HEIGHT	; XH=XH+10
 		brne mult1
 		mov itmp2, XH	; return value
 		ret
-		
+
+; short way for brne commands
+pcint_exit1:
+		rjmp pcint_exit		
 
 ; Here we come every time when Horizontal sync is came.
 ; Per Datasheet it is good to use leading edge of the signal (falling)
@@ -51,13 +54,13 @@ EXT_INT0:
 		; HSOUT horisontal line routine
 		adiw TV_lineH:TV_lineL, 1	; inc TV_lineL:TV_lineH
 		; check current line number (we are using YH:YL just for sake of use adiw next)
-		ldi ldi	XL, low(buff_addr1)	; By default - first voltage to print
+		ldi XL, low(buff_addr1)	; By default - first voltage to print
 		clr XH
 		lds YL, TV_line_start
 		lds YH, TV_line_start+1
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
-		brlo pcint_exit			; not needed to print yet
+		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
 		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH
 		cp TV_lineL, YL
@@ -68,13 +71,13 @@ EXT_INT0:
 		adiw YH:YL, 10	; vertical space between voltages
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
-		brlo pcint_exit			; not needed to print yet
+		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
 		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
-		brsh pcint_exit		; printing is finished
-		ldi ldi	XL, low(buff_addr2)	; we need to print second voltage
+		brsh pcint_exit1		; printing is finished
+		ldi XL, low(buff_addr2)	; we need to print second voltage
 printing:		
 		;  printing...
 		; We will not use first 15us of the HLine. And we can't because of code running at the beginning every line :)
@@ -157,8 +160,8 @@ TV_dot:	bst itmp,1				;1
 		cpi itmp1, 2			;1 - if not dot, then print symbol
 		brne TV_sym				;1/2
 		rjmp TV_dot				;2
-		
 		; ### END OF TV OUT ###
+
 TVprnExit:		
 		sbi	PORTB, CONF_PIN		; restore back pullup for Configure pin
 		dec sym_H_cntr
