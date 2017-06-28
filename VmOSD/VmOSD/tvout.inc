@@ -51,8 +51,12 @@ EXT_INT0:
 		; OK exit
 		sbis PINB, VSOUT_PIN
 		rjmp vsout_newpage
+		; first voltage is double stretched
+		ldi sym_H_strch, SYMBOL_STRETCH	; Double stretch
 		; HSOUT horisontal line routine
 		adiw TV_lineH:TV_lineL, 1	; inc TV_lineL:TV_lineH
+		; preload delay value for horizontal positioning
+		lds	itmp, TV_col_start
 		; check current line number (we are using YH:YL just for sake of use adiw next)
 		ldi XL, low(buff_addr1)	; By default - first voltage to print
 		clr XH
@@ -62,7 +66,7 @@ EXT_INT0:
 		cpc TV_lineH, YH
 		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
-		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH
+		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH	; double height symbols
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brlo printing		; printing...
@@ -73,13 +77,20 @@ EXT_INT0:
 		cpc TV_lineH, YH
 		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
-		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH
+		adiw YH:YL, SYM_HEIGHT ; normal height symbols
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brsh pcint_exit1		; printing is finished
 		ldi XL, low(buff_addr2)	; we need to print second voltage
+		ldi sym_H_strch, 1		; no stretch
+		subi itmp, 6	; adjust delay for proper horizontal position of second voltage
 printing:		
 		;  printing...
+		; Delay to set horizontal position of the text
+		; 10 iterations of this loop is about 3us at 9.6 mhz.
+tmrcpl1:dec	itmp
+		brne tmrcpl1
+		
 		; We will not use first 15us of the HLine. And we can't because of code running at the beginning every line :)
 		; Only about 41us of Line is 100% visible on screen.
 		; prepare data for printing
@@ -98,14 +109,9 @@ cpybuff:ld ZL, X+
 		dec itmp1
 		brne cpybuff
 		
-		; Now is the delay to set horizontal position of the text
-		lds	itmp, TV_col_start
-		; 10 iterations of this loop is about 3us at 9.6 mhz.
-tmrcpl1:dec	itmp
-		brne tmrcpl1
 		; now time to start printing
 		ldi XL, low(buff_data)		; Character bits (updated for every line)
-		clr XH
+		;clr XH	; not needed. It was cleared before
 		ldi itmp1, 6	; 6 characters to print
 		clr itmp2		; bitmap line
 		ld itmp, X+		; get line of the first symbol 
@@ -167,7 +173,7 @@ TVprnExit:
 		dec sym_H_cntr
 		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 		inc sym_line_nr	; go to next line of symbol
-		ldi sym_H_cntr, SYMBOL_STRETCH
+		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
 		
 pcint_exit:
 		out SREG, r_sreg
@@ -178,24 +184,19 @@ vsout_newpage:
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
 		clr TV_lineL
 		clr TV_lineH
-		ldi sym_H_cntr, SYMBOL_STRETCH
 		; counter for low-bat
 		cpi lowbat_cntr, 255
 		breq vsonb
 		dec lowbat_cntr
 vsonb:	;convert voltage to addresses of chars to print
-		clr ZH
-		ldi ZL, low(buff_addr1)
-		ldi itmp, low(symbitmap << 1)	; bitmap
-		st Z+, itmp
-		ldi itmp, low(symspc << 1)		; space
-		st Z+, itmp
-		st Z+, itmp
+		rcall clear_num_addr_buffer
 		; check for low-bat blinking
 		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
-		rjmp clr_buff		; fill buff with spaces
+		rjmp pcint_exit		; leave spaces in buffer
+		ldi ZL, low(buff_addr1)+3	; point to the first digit position (+1) 
 		mov itmp, voltage	; number to convert
 		rcall conv_num_bcd
+		ldi ZL, low(buff_addr2)+3	; point to the first digit position (+1) 
 		mov itmp, voltage_min	; number to convert
 		rcall conv_num_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
 		rjmp pcint_exit				; exit
@@ -228,9 +229,15 @@ Lbcd:	cp itmp, itmp1
 		inc itmp2
 		sub itmp, itmp1
 		rjmp Lbcd
-clr_buff:
+		
+clear_num_addr_buffer:
+		clr ZH
+		ldi ZL, low(buff_addr1)
+		ldi itmp, low(symbitmap << 1)	; bitmap
 		st Z+, itmp
-		st Z+, itmp
-		st Z+, itmp
-		rjmp pcint_exit
+		ldi itmp, low(symspc << 1)		; space
+clr_rb:	st Z+, itmp
+		cpi Zl, low(buff_addr1)+12		; clear 2 buffers
+		brlo clr_rb
+		ret
 

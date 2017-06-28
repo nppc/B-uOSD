@@ -17,6 +17,7 @@
 .EQU	SYM_HEIGHT 				= 10
  
 symbols:
+
 #if defined(SYMBOL_NORMAL)
 .EQU 	SYMBOL_STRETCH 	= 1		; Height of the symbols = SYM_HEIGHT
 

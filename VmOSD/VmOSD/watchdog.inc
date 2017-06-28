@@ -34,9 +34,7 @@ WDT_Start_code:
 WDT_off:
 		wdr		; Reset Watchdog Timer
 		; Clear WDRF in MCUSR
-		in    tmp, MCUSR
-		andi  tmp, (0xff - (1<<WDRF))
-		out   MCUSR, tmp
+		out   MCUSR, z0
 		; Write logical one to WDCE and WDE
 		; Keep old prescaler setting to prevent unintentional time-out
 		in    tmp, WDTCR
@@ -47,8 +45,6 @@ WDT_off:
 		ret
 		
 ;Watchdog interrupt routine here
-WATCHDOG:
-		;in r_sreg, SREG
-		mov adc_cntr,z1		; just update adc variable, because WDT only enabled in Command mode, so, no ADC readings occur
-		;out SREG, r_sreg	
-		reti
+;WATCHDOG:
+;		mov adc_cntr,z1		; just update adc variable, because WDT only enabled in Command mode, so, no ADC readings occur
+;		reti

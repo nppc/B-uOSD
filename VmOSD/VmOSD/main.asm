@@ -60,17 +60,18 @@
 .def	itmp2		=	r4	; variables to use in interrupts
 .def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
 .def	sym_line_nr	=	r5 	; line number of printed text (0 based)
-.def	sym_H_cntr	=	r21	; counter for symbol stretching
-.def	lowbat_cntr	=	r22	; counter for blinking voltage when it gets low
+.def	lowbat_cntr	=	r21	; counter for blinking voltage when it gets low
+.def	sym_H_strch	=	r22	; value for symbol stretching
+.def	sym_H_cntr	=	r6	; counter for symbol stretching
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
-.def	adc_cntr	=	r6	; counter for ADC readings
-.def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
-.def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
-.def	OSCCAL_nom	=	r9	; preserve here Factory value for nominal freq
-.def	voltage_min	=	r10	; Minimum detected voltage. voltage in volts * 10 (dot will be printed in)
+.def	adc_cntr	=	r7	; counter for ADC readings
+.def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
+.def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
+.def	OSCCAL_nom	=	r10	; preserve here Factory value for nominal freq
+.def	voltage_min	=	r11	; Minimum detected voltage. voltage in volts * 10 (dot will be printed in)
 
 .DSEG
 .ORG 0x60
@@ -104,7 +105,7 @@ EE_Bat_low_volt:	.DB 0
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
-		rjmp WATCHDOG ; Watchdog Interrupt Handler
+		mov adc_cntr,z1	;Watchdog Interrupt Handler. just update adc variable, because WDT only enabled in Command mode, so, no ADC readings occur
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
@@ -126,7 +127,7 @@ RESET:
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 255	; No blink 
 		mov voltage_min, lowbat_cntr	; store maximal (255) value. Variable will be updated after first ADC reading
-		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
+		mov sym_H_cntr, z1	; init variable
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
 		
 		; change speed (ensure 9.6 mhz ossc)
