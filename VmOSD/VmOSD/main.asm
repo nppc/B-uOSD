@@ -70,11 +70,13 @@
 .def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
 .def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
 .def	OSCCAL_nom	=	r9	; preserve here Factory value for nominal freq
+.def	voltage_min	=	r10	; Minimum detected voltage. voltage in volts * 10 (dot will be printed in)
 
 .DSEG
 .ORG 0x60
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
-buff_addr:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+buff_addr1:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+buff_addr2:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_data:		.BYTE 6	; We have 6 symbols to print
 Configuration_settings:	; From here  starts SRAM, that will be preserved in EEPROM
 TV_line_start:	.BYTE 2	; Line number where we start print data (Configurable)
@@ -123,6 +125,7 @@ RESET:
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 255	; No blink 
+		mov voltage_min, lowbat_cntr	; store maximal (255) value. Variable will be updated after first ADC reading
 		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
 		
