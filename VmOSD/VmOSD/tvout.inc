@@ -86,13 +86,14 @@ EXT_INT0:
 		subi itmp, 6	; adjust delay for proper horizontal position of second voltage
 printing:		
 		;  printing...
+		; We will not use first 15us of the HLine. And we can't because of code running at the beginning every line :)
+		; Only about 41us of Line is 100% visible on screen.
+
 		; Delay to set horizontal position of the text
 		; 10 iterations of this loop is about 3us at 9.6 mhz.
 tmrcpl1:dec	itmp
 		brne tmrcpl1
 		
-		; We will not use first 15us of the HLine. And we can't because of code running at the beginning every line :)
-		; Only about 41us of Line is 100% visible on screen.
 		; prepare data for printing
 		; fill data buffer with printed line of bits
 		; current line number in sym_line_nr
