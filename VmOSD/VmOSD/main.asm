@@ -17,9 +17,9 @@
 .include "tn13Adef.inc"
 
 ;#define SYMBOL_NORMAL ; 6bit wide
-;#define SYMBOL_DOUBLE ; double height font (7bit)
+#define SYMBOL_DOUBLE ; double height font (7bit)
 
-;#define BITMAP_COPTER
+#define BITMAP_COPTER
 ;#define BITMAP_GOOGLES
  
  ; at 9.6mhz, 10 cycles = 1us
@@ -29,12 +29,14 @@
 									; 24 is about 13 mhz.
 .EQU	BAUD 		 	= 19200 	; bps
 
+;.EQU	SYMBOL_STRETCH	= 2			; How much ti dublicate every line
+
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 100	; Column where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 140	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula (for 4S max): 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
