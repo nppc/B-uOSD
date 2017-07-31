@@ -12,6 +12,8 @@ It is very small and simple OSD for monitoring Battery voltage.
 It has minuses too.
 - Very basic (only one voltage monitoring)
 - Due to small and slow mcu (no special mcu for signal generation) the OSD picture is not as stable as other bigger OSDs.
+- No shadow around the symbols (not visible on white background).
+![Sample Double height](Images/Assembled_MCU_side.jpg)
 ![Sample Double height](Images/Sample_DG.jpg)
 ![Sample Normal height](Images/Sample_NC.jpg)
 
@@ -20,7 +22,8 @@ There is many possibilities to use this OSD.
 One example for 1S setup:
 ![Sample connection 1S](Images/1S_Connection.jpg)
 
-*(Another example for EF-02 AIO combo camera/vtx comming...)*
+Another example for AIO combo camera/vtx 1S setup:
+![Sample connection AIO 1S](Images/1S_Connection_AIO.jpg)
 
 ## Configuration
 There is (C)onfiguration pin. BAUDRATE is 19200.
