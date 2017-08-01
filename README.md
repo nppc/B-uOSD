@@ -3,16 +3,21 @@ It is very small and simple OSD for monitoring Battery voltage.
 ![Virtual PCB top](Images/PCB_Top.png)
 ![Virtual PCB bottom](Images/PCB_Bottom.png)
 - Supports 1S-4S battery monitoring. (Changing onboard voltage divider can be extended for bigger batteries.)
+- Adjustable text position.
+- Shows current voltage and minimal detected voltage.
+- Voltage blinking if battery running low.
 - Supply voltage 3.3-5.5v.
 - Low supply current, no heat generation.
 - It is very small size (8.8mm X 6mm).
 - Virtually weights nothing.
-- Some Configurable parameters via Serial
+- Configurable parameters via Serial.
 
 It has minuses too.
 - Very basic (only one voltage monitoring)
 - Due to small and slow mcu (no special mcu for signal generation) the OSD picture is not as stable as other bigger OSDs.
 - No shadow around the symbols (not visible on white background).
+
+Some screenshots:
 ![Sample Double height](Images/Assembled_MCU_side.jpg)
 ![Sample Double height](Images/Sample_DG.jpg)
 ![Sample Normal height](Images/Sample_DC_2LINES.jpg)
