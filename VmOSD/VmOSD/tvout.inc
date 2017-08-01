@@ -26,28 +26,11 @@ mult1:	subi XH, -SYM_HEIGHT	; XH=XH+10
 		brne mult1
 		mov itmp2, XH	; return value
 		ret
-		
 
-; this routine is called from interrupts, so use interrupt registers
-; fill data buffer with printed line of bits
-; current line number in sym_line_nr
-; buff_addr contains addresses of every printed char
-fill_num_buff_data:
-		; so, we just need to add sym_line _nr to the address and read data from flash to sram
-		ldi	XL, low(buff_addr)
-		clr XH
-		ldi YL, low(buff_data)
-		clr YH
-		clr ZH
-		ldi itmp1, 6	; bytes to copy
-cpybuff:ld ZL, X+
-		add ZL, sym_line_nr		; go to current line in char bitmap
-		lpm	itmp, Z
-		st Y+, itmp
-		dec itmp1
-		brne cpybuff
-		ret
-		
+; short way for brne commands and also resets sym_line_nr for proper printing of 2 voltages
+pcint_exit1:
+		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
+		rjmp pcint_exit		
 
 ; Here we come every time when Horizontal sync is came.
 ; Per Datasheet it is good to use leading edge of the signal (falling)
@@ -69,33 +52,68 @@ EXT_INT0:
 		; OK exit
 		sbis PINB, VSOUT_PIN
 		rjmp vsout_newpage
+		; first voltage is double stretched
+		ldi sym_H_strch, SYMBOL_STRETCH	; Double stretch
 		; HSOUT horisontal line routine
 		adiw TV_lineH:TV_lineL, 1	; inc TV_lineL:TV_lineH
-		; check current line number (we are using XH:XL just for sake of use adiw next)
-		lds XL, TV_line_start
-		lds XH, TV_line_start+1
-		cp TV_lineL, XL
-		cpc TV_lineH, XH
-		brlo pcint_exit			; not needed to print yet
+		; preload delay value for horizontal positioning
+		lds	itmp, TV_col_start
+		; check current line number (we are using YH:YL just for sake of use adiw next)
+		ldi XL, low(buff_addr1)	; By default - first voltage to print
+		clr XH
+		lds YL, TV_line_start
+		lds YH, TV_line_start+1
+		cp TV_lineL, YL
+		cpc TV_lineH, YH
+		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
-		adiw XH:XL, SYM_HEIGHT * SYMBOL_STRETCH
-		cp TV_lineL, XL
-		cpc TV_lineH, XH
-		brsh pcint_exit		; printing is finished, just exit
-		
+		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH - 1	; double height symbols
+		cp TV_lineL, YL
+		cpc TV_lineH, YH
+		brlo printing		; printing...
+		; first voltage is printed
+		; check for the second voltage
+		adiw YH:YL, 10	; vertical space between voltages
+		cp TV_lineL, YL
+		cpc TV_lineH, YH
+		brlo pcint_exit1			; not needed to print yet
+		; calculate last line to print
+		adiw YH:YL, SYM_HEIGHT+1 ; normal height symbols
+		cp TV_lineL, YL
+		cpc TV_lineH, YH
+		brsh pcint_exit1		; printing is finished
+		ldi XL, low(buff_addr2)	; we need to print second voltage
+		ldi sym_H_strch, 1		; no stretch
+		subi itmp, 4	; adjust delay for proper horizontal position of second voltage
+printing:		
 		;  printing...
 		; We will not use first 15us of the HLine. And we can't because of code running at the beginning every line :)
 		; Only about 41us of Line is 100% visible on screen.
-		; prepare data for printing
-		rcall fill_num_buff_data	; 4.7us
-		; Now is the delay to set horizontal position of the text
-		lds	itmp, TV_col_start
+
+		; Delay to set horizontal position of the text
 		; 10 iterations of this loop is about 3us at 9.6 mhz.
 tmrcpl1:dec	itmp
 		brne tmrcpl1
+		
+		; prepare data for printing
+		; fill data buffer with printed line of bits
+		; current line number in sym_line_nr
+		; buff_addr1 and 2 contains addresses of every printed char
+		; so, we just need to add sym_line _nr to the address and read data from flash to sram
+		ldi YL, low(buff_data)
+		clr YH
+		clr ZH
+		ldi itmp1, 6	; bytes to copy
+cpybuff:ld ZL, X+
+		add ZL, sym_line_nr		; go to current line in char bitmap
+		lpm	itmp, Z
+		st Y+, itmp
+		dec itmp1
+		brne cpybuff
+		
 		; now time to start printing
-		ldi XL, low(buff_data)		; Characted bits (updated for every line
-		clr XH
+		ldi XL, low(buff_data)		; Character bits (updated for every line)
+		;clr XH	; not needed. It was cleared before
 		ldi itmp1, 6	; 6 characters to print
 		clr itmp2		; bitmap line
 		ld itmp, X+		; get line of the first symbol 
@@ -150,14 +168,14 @@ TV_dot:	bst itmp,1				;1
 		cpi itmp1, 2			;1 - if not dot, then print symbol
 		brne TV_sym				;1/2
 		rjmp TV_dot				;2
-		
 		; ### END OF TV OUT ###
+
 TVprnExit:		
 		sbi	PORTB, CONF_PIN		; restore back pullup for Configure pin
 		dec sym_H_cntr
 		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 		inc sym_line_nr	; go to next line of symbol
-		ldi sym_H_cntr, SYMBOL_STRETCH
+		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
 		
 pcint_exit:
 		out SREG, r_sreg
@@ -165,26 +183,28 @@ pcint_exit:
 
 ; new page routine
 vsout_newpage:
-		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
+		;clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
 		clr TV_lineL
 		clr TV_lineH
-		ldi sym_H_cntr, SYMBOL_STRETCH
 		; counter for low-bat
 		cpi lowbat_cntr, 255
 		breq vsonb
 		dec lowbat_cntr
 vsonb:	;convert voltage to addresses of chars to print
-		clr ZH
-		ldi ZL, low(buff_addr)
-		ldi itmp, low(symbitmap << 1)	; bitmap
-		st Z+, itmp
-		ldi itmp, low(symspc << 1)		; space
-		st Z+, itmp
-		st Z+, itmp
+		rcall clear_num_addr_buffer
 		; check for low-bat blinking
 		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
-		rjmp clr_buff		; fill buff with spaces
+		rjmp pcint_exit		; leave spaces in buffer
+		ldi ZL, low(buff_addr1)+3	; point to the first digit position (+1) 
 		mov itmp, voltage	; number to convert
+		rcall conv_num_bcd
+		ldi ZL, low(buff_addr2)+3	; point to the first digit position (+1) 
+		mov itmp, voltage_min	; number to convert
+		rcall conv_num_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
+		rjmp pcint_exit				; exit
+
+; convert number and store to SRAM digit addresses
+conv_num_bcd:
 		ldi itmp1, 100
 		rcall conv_d_bcd
 		cp itmp2, z0	;	remove leading zero
@@ -200,19 +220,26 @@ clear0:	ldi itmp1, 10
 		st Z+, itmp1
 		mov itmp2, itmp
 		rcall conv_bcd_to_address
-		st Z, itmp2
-		rjmp pcint_exit				; exit
+		st Z+, itmp2
+l_ret:	ret
 
+; convert one digit		
 conv_d_bcd:
 		clr itmp2
 Lbcd:	cp itmp, itmp1
-		brlo pcint_exit
+		brlo l_ret			; just use some ret to preserve FLASH
 		inc itmp2
 		sub itmp, itmp1
 		rjmp Lbcd
-clr_buff:
+		
+clear_num_addr_buffer:
+		clr ZH
+		ldi ZL, low(buff_addr1)
+		ldi itmp, low(symbitmap << 1)	; bitmap
 		st Z+, itmp
-		st Z+, itmp
-		st Z+, itmp
-		rjmp pcint_exit
+		ldi itmp, low(symspc << 1)		; space
+clr_rb:	st Z+, itmp
+		cpi ZL, low(buff_addr1)+12		; clear 2 buffers
+		brlo clr_rb
+		ret
 

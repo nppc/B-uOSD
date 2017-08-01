@@ -74,7 +74,17 @@ EnterCommandMode:
 
 		; We first receive 0x55, to enable Serial
 		; wait until port stabilize (all 0x55 char is received)
-		rcall SA_Wait_Transfer_Compelted
+;SA_L1:	clr tmp			; about 20-30ms
+;		clr tmp1
+;SA_L2:	sbis PINB, CONF_PIN
+;		rjmp SA_L1				; start over, transmision is not finished
+;		dec  tmp1
+;		brne SA_L2
+;		dec  tmp
+;		brne SA_L2
+SA_L1:	rcall wait_for_start_short
+		cp tmp2, z0
+		brne SA_L1		; still some characters are comming...
 		; Now wait for characters
 Cm_wt:	rcall wait_for_start_short	; we should wait for first bit forever...
 		cp tmp2, z0
@@ -100,7 +110,7 @@ Cm_LB:	rcall UART_get_byte
 		;  FFFF - Reset to Factory settings
 		;  TTTT - Test settings (show OSD for 4 seconds)
 		ldi ZL, low(buff_data)
-		clr ZH
+		;clr ZH	; not needed here
 		ld tmp, Z+
 		cpi tmp, 'X'
 		breq Cm_Exit
@@ -231,16 +241,6 @@ Cm_mul1:add adc_sumL, tmp
 		ret
 
 		
-SA_Wait_Transfer_Compelted:
-SA_L1:	clr tmp			; about 20-30ms
-		clr tmp1
-SA_L2:	sbis PINB, CONF_PIN
-		rjmp SA_L1				; start over, transmision is not finished
-		dec  tmp1
-		brne SA_L2
-		dec  tmp
-		brne SA_L2
-		ret
 
 ; tmp2 returns flag for start bit: 1-start bit, 0-timeout expired
 wait_for_start_short:

@@ -17,9 +17,9 @@
 .include "tn13Adef.inc"
 
 ;#define SYMBOL_NORMAL ; 6bit wide
-;#define SYMBOL_DOUBLE ; double height font (7bit)
+#define SYMBOL_DOUBLE ; double height font (7bit)
 
-;#define BITMAP_COPTER
+#define BITMAP_COPTER
 ;#define BITMAP_GOOGLES
  
  ; at 9.6mhz, 10 cycles = 1us
@@ -29,12 +29,14 @@
 									; 24 is about 13 mhz.
 .EQU	BAUD 		 	= 19200 	; bps
 
+;.EQU	SYMBOL_STRETCH	= 2			; How much ti dublicate every line
+
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)
 
 
 .EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 100	; Column where we start to print
+.EQU	FIRST_PRINT_TV_COLUMN 	= 140	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula (for 4S max): 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
@@ -60,21 +62,24 @@
 .def	itmp2		=	r4	; variables to use in interrupts
 .def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
 .def	sym_line_nr	=	r5 	; line number of printed text (0 based)
-.def	sym_H_cntr	=	r21	; counter for symbol stretching
-.def	lowbat_cntr	=	r22	; counter for blinking voltage when it gets low
+.def	lowbat_cntr	=	r21	; counter for blinking voltage when it gets low
+.def	sym_H_strch	=	r22	; value for symbol stretching
+.def	sym_H_cntr	=	r6	; counter for symbol stretching
 ;						r23
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
-.def	adc_cntr	=	r6	; counter for ADC readings
-.def	adc_sumL	=	r7	; accumulated readings of ADC (sum of 64 values)
-.def	adc_sumH	=	r8	; accumulated readings of ADC (sum of 64 values)
-.def	OSCCAL_nom	=	r9	; preserve here Factory value for nominal freq
+.def	adc_cntr	=	r7	; counter for ADC readings
+.def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
+.def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
+.def	OSCCAL_nom	=	r10	; preserve here Factory value for nominal freq
+.def	voltage_min	=	r11	; Minimum detected voltage. voltage in volts * 10 (dot will be printed in)
 
 .DSEG
 .ORG 0x60
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
-buff_addr:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+buff_addr1:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+buff_addr2:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_data:		.BYTE 6	; We have 6 symbols to print
 Configuration_settings:	; From here  starts SRAM, that will be preserved in EEPROM
 TV_line_start:	.BYTE 2	; Line number where we start print data (Configurable)
@@ -102,7 +107,7 @@ EE_Bat_low_volt:	.DB 0
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
-		rjmp WATCHDOG ; Watchdog Interrupt Handler
+		mov adc_cntr,z1	;Watchdog Interrupt Handler. just update adc variable, because WDT only enabled in Command mode, so, no ADC readings occur
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
@@ -123,7 +128,8 @@ RESET:
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 255	; No blink 
-		ldi sym_H_cntr, SYMBOL_STRETCH	; init variable just in case
+		mov voltage_min, lowbat_cntr	; store maximal (255) value. Variable will be updated after first ADC reading
+		mov sym_H_cntr, z1	; init variable
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
 		
 		; change speed (ensure 9.6 mhz ossc)
@@ -155,8 +161,7 @@ RESET:
 		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 1<<ADPS0
 		out ADCSRA, tmp
 		; turn off digital circuity in analog pin
-		ldi tmp, 1<<VBAT_PIN
-		out DIDR0, tmp
+		sbi DIDR0, VBAT_PIN
 		
 		rcall OverclockMCU
 
@@ -188,10 +193,10 @@ OverclockMCU:
 		ldi tmp1, 1			; increment
 OSC_gen:
 		ldi tmp, OVERCLOCK_VAL
-OSC_up:	add tmp2, tmp1
+OSC_ch:	add tmp2, tmp1		; We can't use here inc command because this part of code used as "dec" too.
 		out OSCCAL, tmp2
 		dec tmp
-		brne OSC_up
+		brne OSC_ch
 OSC_exit:
 		ret
 		

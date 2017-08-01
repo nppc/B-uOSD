@@ -60,6 +60,11 @@ adc_4:	;apply voltage adjustment
 		add tmp2, tmp
 		; return voltage for OSD 
 		mov voltage, tmp2	; now we have beautiful result for printing
+		; check for minimal detected voltage
+		cp voltage, voltage_min
+		brsh adc_nomin
+		mov voltage_min, voltage
+adc_nomin:
 		; check for low-voltage
 		lds tmp, Bat_low_volt
 		cp voltage, tmp 
