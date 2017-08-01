@@ -74,14 +74,6 @@ EnterCommandMode:
 
 		; We first receive 0x55, to enable Serial
 		; wait until port stabilize (all 0x55 char is received)
-;SA_L1:	clr tmp			; about 20-30ms
-;		clr tmp1
-;SA_L2:	sbis PINB, CONF_PIN
-;		rjmp SA_L1				; start over, transmision is not finished
-;		dec  tmp1
-;		brne SA_L2
-;		dec  tmp
-;		brne SA_L2
 SA_L1:	rcall wait_for_start_short
 		cp tmp2, z0
 		brne SA_L1		; still some characters are comming...

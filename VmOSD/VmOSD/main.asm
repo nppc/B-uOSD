@@ -16,11 +16,22 @@
 
 .include "tn13Adef.inc"
 
-;#define SYMBOL_NORMAL ; 6bit wide
-#define SYMBOL_DOUBLE ; double height font (7bit)
+;***** Enable second line for min voltage ******
+;** lowest measured voltage will be displayed **
+;#define ENABLE_MINVOLT	; Enable second line for minimal measured voltage
 
-#define BITMAP_COPTER
+;***** Symbol height for printing voltage ******
+;******** uncomment one of the defines *********
+;#define SYMBOL_NORMAL ; 6bit wide
+;#define SYMBOL_DOUBLE ; double height font (7bit wide)
+
+;***** BITMAP before voltage ******
+;** uncomment one of the defines **
+;#define BITMAP_COPTER
 ;#define BITMAP_GOOGLES
+;#define BITMAP_NONE	
+
+;---- END of configurable defines ----
  
  ; at 9.6mhz, 10 cycles = 1us
 .EQU	OVERCLOCK_VAL	= 24		; How much to add to OSCCAL for overclocking
@@ -28,8 +39,6 @@
 									; 16 is about 11.5 mhz.
 									; 24 is about 13 mhz.
 .EQU	BAUD 		 	= 19200 	; bps
-
-;.EQU	SYMBOL_STRETCH	= 2			; How much ti dublicate every line
 
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)

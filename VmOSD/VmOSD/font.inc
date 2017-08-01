@@ -258,6 +258,9 @@ symdot:	.DB 0b00000000, \
 			0b00000011, \
 			0b00000011
 
+#if defined(BITMAP_NONE)
+symbitmap:	; if no bitmap needed, then just print a space
+#endif
 symspc:	.DB 0b00000000, \
 			0b00000000, \
 			0b00000000, \

@@ -15,7 +15,7 @@ It has minuses too.
 - No shadow around the symbols (not visible on white background).
 ![Sample Double height](Images/Assembled_MCU_side.jpg)
 ![Sample Double height](Images/Sample_DG.jpg)
-![Sample Normal height](Images/Sample_NC.jpg)
+![Sample Normal height](Images/Sample_DC_2LINES.jpg)
 
 ## Connection
 There is many possibilities to use this OSD.

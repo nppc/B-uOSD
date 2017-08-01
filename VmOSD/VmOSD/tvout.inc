@@ -72,6 +72,7 @@ EXT_INT0:
 		cpc TV_lineH, YH
 		brlo printing		; printing...
 		; first voltage is printed
+#if defined(ENABLE_MINVOLT)
 		; check for the second voltage
 		adiw YH:YL, 10	; vertical space between voltages
 		cp TV_lineL, YL
@@ -85,6 +86,10 @@ EXT_INT0:
 		ldi XL, low(buff_addr2)	; we need to print second voltage
 		ldi sym_H_strch, 1		; no stretch
 		subi itmp, 4	; adjust delay for proper horizontal position of second voltage
+#else
+		; No need to print second line
+		rjmp pcint_exit1
+#endif
 printing:		
 		;  printing...
 		; We will not use first 15us of the HLine. And we can't because of code running at the beginning every line :)
