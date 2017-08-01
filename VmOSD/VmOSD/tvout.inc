@@ -30,6 +30,7 @@ mult1:	subi XH, -SYM_HEIGHT	; XH=XH+10
 ; short way for brne commands and also resets sym_line_nr for proper printing of 2 voltages
 pcint_exit1:
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
+		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
 		rjmp pcint_exit		
 
 ; Here we come every time when Horizontal sync is came.
@@ -67,24 +68,24 @@ EXT_INT0:
 		cpc TV_lineH, YH
 		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
-		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH - 1	; double height symbols
+		adiw YH:YL, SYM_HEIGHT * SYMBOL_STRETCH	; double height symbols
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brlo printing		; printing...
 		; first voltage is printed
 #if defined(ENABLE_MINVOLT)
 		; check for the second voltage
+		ldi sym_H_strch, 1		; no stretch
 		adiw YH:YL, 10	; vertical space between voltages
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brlo pcint_exit1			; not needed to print yet
 		; calculate last line to print
-		adiw YH:YL, SYM_HEIGHT+1 ; normal height symbols
+		adiw YH:YL, SYM_HEIGHT ; normal height symbols
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brsh pcint_exit1		; printing is finished
 		ldi XL, low(buff_addr2)	; we need to print second voltage
-		ldi sym_H_strch, 1		; no stretch
 		subi itmp, 4	; adjust delay for proper horizontal position of second voltage
 #else
 		; No need to print second line
