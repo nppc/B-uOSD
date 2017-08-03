@@ -1,7 +1,7 @@
 # Battery voltage microOSD v1.2
 Very small and simple OSD for monitoring Battery voltage. It is useful for AIO micro cameras, FPV helmet etc.
 
-The PCB is very small:
+The PCB is very small. Can be ordered at OshPark: https://oshpark.com/shared_projects/nvOy0lBm
 ![Virtual PCB top](Images/PCB_Top.png)
 ![Virtual PCB bottom](Images/PCB_Bottom.png)
 
