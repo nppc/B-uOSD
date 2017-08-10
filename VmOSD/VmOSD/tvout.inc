@@ -182,7 +182,7 @@ TVprnExit:
 		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 		inc sym_line_nr	; go to next line of symbol
 		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
-		
+
 pcint_exit:
 		out SREG, r_sreg
 		reti
@@ -201,6 +201,7 @@ vsonb:	;convert voltage to addresses of chars to print
 		; check for low-bat blinking
 		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
 		rjmp pcint_exit		; leave spaces in buffer
+		inc TV_lineL		; We need more time for math, so add some
 		ldi ZL, low(buff_addr1)+3	; point to the first digit position (+1) 
 		mov itmp, voltage	; number to convert
 		rcall conv_num_bcd
