@@ -357,6 +357,13 @@ sym9:	.DB 0b01111111, \
 			0b01111111
 #endif
 
+#if defined(BITMAP_NONE)
+symbitmap:	; if no bitmap needed, then just print a space
+#endif
+; use the rest of space symbol from dot symbol
+symspc:	.DB 0b00000000, \
+			0b00000000
+			
 symdot:	.DB 0b00000000, \
 			0b00000000, \
 			0b00000000, \
@@ -371,16 +378,6 @@ symdot:	.DB 0b00000000, \
 #if defined(BITMAP_NONE)
 symbitmap:	; if no bitmap needed, then just print a space
 #endif
-symspc:	.DB 0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000, \
-			0b00000000
 
 #if defined(BITMAP_COPTER)
 symbitmap:

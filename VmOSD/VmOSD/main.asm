@@ -136,8 +136,8 @@ RESET:
 		inc z1
 		clr adc_cntr		; couter for ADC readings (starting from 0)
 		clr sym_line_nr		; first line of the char
-		ldi lowbat_cntr, 255	; No blink 
-		mov voltage_min, lowbat_cntr	; store maximal (255) value. Variable will be updated after first ADC reading
+		ldi lowbat_cntr, 254	; We want to start this counter to make a delay for voltage stabilizing
+		mov voltage_min, lowbat_cntr	; store big (254) value. Variable will be updated after first ADC reading
 		mov sym_H_cntr, z1	; init variable
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
 		
@@ -175,6 +175,10 @@ RESET:
 		rcall OverclockMCU
 
 		sei ; Enable interrupts
+		; wait some time before voltage stabilize (lowbat_cntr = 254)
+strt_wt:sbrc lowbat_cntr, 6	; if bit clears, then we can continue (variabe decs every video frame (25/30 times in 1 sec)
+		rjmp strt_wt		; leave spaces in buffer
+		ldi lowbat_cntr, 255	; stop counter
 
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
