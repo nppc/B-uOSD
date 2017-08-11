@@ -24,7 +24,8 @@ It has minuses too.
 Some screenshots:
 ![Sample Double height](Images/Assembled_MCU_side.jpg)
 ![Sample Double height](Images/Sample_DG.jpg)
-![Sample Normal height](Images/Sample_DC_2LINES.jpg)
+One OSD in Helmet, other in Copter. New square font.
+![Sample Normal height](Images/Sample_DC_2LINES_combined.jpg)
 
 ## Connection
 There is many possibilities to use this OSD.
