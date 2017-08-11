@@ -4,3 +4,4 @@
 %AVRpath%\avrasm2.exe -D SYMBOL_NORMAL -D BITMAP_COPTER -o ../../Bin/B-uOSD_NC_v12.hex -fI main.asm
 %AVRpath%\avrasm2.exe -D SYMBOL_DOUBLE -D BITMAP_COPTER -D ENABLE_MINVOLT -o ../../Bin/B-uOSD_DC_v12.hex -fI main.asm
 @cd ..\..\Bin
+pause

@@ -15,24 +15,42 @@
 ; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
 
 
-; this routine is called from interrupts, so use interrupt registers
-; tmp2 contains bcd number
-; Convert Char number to address
-conv_bcd_to_address:		
-		; use XH register just because it is free 
-		ldi XH, low(symbols << 1)	; we need only low address byte, because fonts are at the beginning of the flash
-mult1:	subi XH, -SYM_HEIGHT	; XH=XH+10
-		dec	itmp2
-		brne mult1
-		mov itmp2, XH	; return value
-		ret
-
+; We need to do complicated math after text is printed.
+; This is the safest way to do that. So, run this routine right after text is printed.		
+pcint_refill_buffer:
+		cp sym_line_nr, z0
+		breq pcint_ext2
+		; counter for low-bat
+		cpi lowbat_cntr, 255
+		breq vsonb
+		dec lowbat_cntr
+vsonb:	;convert voltage to addresses of chars to print
+		rcall clear_num_addr_buffer
+		; check for low-bat blinking
+		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
+		rjmp pcint_exit1		; leave spaces in buffer
+		ldi ZL, low(buff_addr1)+3	; point to the first digit position (+1) 
+		mov itmp, voltage	; number to convert
+		rcall conv_num_bcd
+		ldi ZL, low(buff_addr2)+3	; point to the first digit position (+1) 
+		mov itmp, voltage_min	; number to convert
+		rcall conv_num_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
+		
 ; short way for brne commands and also resets sym_line_nr for proper printing of 2 voltages
 pcint_exit1:
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
 		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
+pcint_ext2:
 		rjmp pcint_exit		
 
+
+; new page routine
+vsout_newpage:
+		clr TV_lineL
+		clr TV_lineH
+		rjmp pcint_exit		; exit
+
+		
 ; Here we come every time when Horizontal sync is came.
 ; Per Datasheet it is good to use leading edge of the signal (falling)
 ; we come here only when new TV line is started. 
@@ -84,12 +102,12 @@ EXT_INT0:
 		adiw YH:YL, SYM_HEIGHT ; normal height symbols
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
-		brsh pcint_exit1		; printing is finished
+		brsh pcint_refill_buffer		; text is printed, refill buffers
 		ldi XL, low(buff_addr2)	; we need to print second voltage
 		subi itmp, 4	; adjust delay for proper horizontal position of second voltage
 #else
 		; No need to print second line
-		rjmp pcint_exit1
+		rjmp pcint_refill_buffer	; text is printed, refill buffers
 #endif
 printing:		
 		;  printing...
@@ -187,29 +205,7 @@ pcint_exit:
 		out SREG, r_sreg
 		reti
 
-; new page routine
-vsout_newpage:
-		;clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
-		clr TV_lineL
-		clr TV_lineH
-		; counter for low-bat
-		cpi lowbat_cntr, 255
-		breq vsonb
-		dec lowbat_cntr
-vsonb:	;convert voltage to addresses of chars to print
-		rcall clear_num_addr_buffer
-		; check for low-bat blinking
-		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
-		rjmp pcint_exit		; leave spaces in buffer
-		inc TV_lineL		; We need more time for math, so add some
-		ldi ZL, low(buff_addr1)+3	; point to the first digit position (+1) 
-		mov itmp, voltage	; number to convert
-		rcall conv_num_bcd
-		ldi ZL, low(buff_addr2)+3	; point to the first digit position (+1) 
-		mov itmp, voltage_min	; number to convert
-		rcall conv_num_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
-		rjmp pcint_exit				; exit
-
+		
 ; convert number and store to SRAM digit addresses
 conv_num_bcd:
 		ldi itmp1, 100
@@ -250,3 +246,14 @@ clr_rb:	st Z+, itmp
 		brlo clr_rb
 		ret
 
+; this routine is called from interrupts, so use interrupt registers
+; tmp2 contains bcd number
+; Convert Char number to address
+conv_bcd_to_address:		
+		; use XH register just because it is free 
+		ldi XH, low(symbols << 1)	; we need only low address byte, because fonts are at the beginning of the flash
+mult1:	subi XH, -SYM_HEIGHT	; XH=XH+10
+		dec	itmp2
+		brne mult1
+		mov itmp2, XH	; return value
+		ret
