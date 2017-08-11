@@ -69,20 +69,19 @@
 .def	itmp		=	r18	; variables to use in interrupts
 .def	itmp1		=	r19	; variables to use in interrupts
 .def	itmp2		=	r4	; variables to use in interrupts
-.def	voltage		=	r20	; voltage in volts * 10 (dot will be printed in)
-.def	sym_line_nr	=	r5 	; line number of printed text (0 based)
+.def	voltage		=	r5	; voltage in volts * 10 (dot will be printed in)
+.def	voltage_min	=	r20	; Minimum detected voltage. voltage in volts * 10 (dot will be printed in)
+.def	sym_line_nr	=	r6 	; line number of printed text (0 based)
 .def	lowbat_cntr	=	r21	; counter for blinking voltage when it gets low
 .def	sym_H_strch	=	r22	; value for symbol stretching
-.def	sym_H_cntr	=	r6	; counter for symbol stretching
-;						r23
+.def	sym_H_cntr	=	r7	; counter for symbol stretching
+.def	adc_cntr	=	r23	; counter for ADC readings
 .def	TV_lineL	=	r24 ; counter for TV lines Low byte. (don't change register mapping here)
 .def	TV_lineH	=	r25 ; counter for TV lines High byte. (don't change register mapping here)
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
-.def	adc_cntr	=	r7	; counter for ADC readings
 .def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
 .def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
 .def	OSCCAL_nom	=	r10	; preserve here Factory value for nominal freq
-.def	voltage_min	=	r11	; Minimum detected voltage. voltage in volts * 10 (dot will be printed in)
 
 .DSEG
 .ORG 0x60
@@ -134,10 +133,10 @@ RESET:
 		clr z0
 		clr z1
 		inc z1
-		clr adc_cntr		; couter for ADC readings (starting from 0)
+		;clr adc_cntr		; couter for ADC readings. No need to initialize. Anyway we give some time for ADC to initialize all variables and states
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 254	; We want to start this counter to make a delay for voltage stabilizing
-		mov voltage_min, lowbat_cntr	; store big (254) value. Variable will be updated after first ADC reading
+		;mov voltage_min, lowbat_cntr	; store big (255) value. Variable will be updated later
 		mov sym_H_cntr, z1	; init variable
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
 		
@@ -174,11 +173,17 @@ RESET:
 		
 		rcall OverclockMCU
 
+		; Wait for voltage stabilizing and ADC warmup
+strt_wt:sbic ADCSRA, ADSC
+		rjmp strt_wt
+		; ADC is ready
+		rcall ReadVoltage
+		dec lowbat_cntr
+		brne strt_wt	; read ADC 255 times
+		; now our voltage and voltage_min is messed. Lets reset at least voltage_min.
+		ldi voltage_min, 255
+		
 		sei ; Enable interrupts
-		; wait some time before voltage stabilize (lowbat_cntr = 254)
-strt_wt:sbrc lowbat_cntr, 6	; if bit clears, then we can continue (variabe decs every video frame (25/30 times in 1 sec)
-		rjmp strt_wt		; leave spaces in buffer
-		ldi lowbat_cntr, 255	; stop counter
 
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
