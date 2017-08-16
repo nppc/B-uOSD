@@ -29,7 +29,12 @@
 ;** uncomment one of the defines **
 ;#define BITMAP_COPTER
 ;#define BITMAP_GOOGLES
-;#define BITMAP_NONE	
+;#define BITMAP_NONE
+
+;********* CONFIGURATION disable **************
+;** Removes support for serial configuration **
+#define NOCONFIG
+	
 
 ;---- END of configurable defines ----
  
@@ -38,14 +43,16 @@
 									; 8 is about 10.4 mhz.
 									; 16 is about 11.5 mhz.
 									; 24 is about 13 mhz.
+#if !defined(NOCONFIG)
 .EQU	BAUD 		 	= 19200 	; bps
+#endif
 
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)
 
 
-.EQU	FIRST_PRINT_TV_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_TV_COLUMN 	= 140	; Column where we start to print
+.EQU	FIRST_PRINT_VOLT_LINE 	= 240	; Line where we start to print
+.EQU	FIRST_PRINT_VOLT_COLUMN = 140	; Column where we start to print
 .EQU	VOLT_DIV_CONST			= 186	; To get this number use formula (for 4S max): 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
@@ -53,6 +60,7 @@
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
 .EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
+.EQU	BAT_CORRECTION			= 0		; Signed value for correction voltage readings
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -81,7 +89,9 @@
 ; Variables XL:XH, YL:YH, ZL:ZH are used in interrupts, so only use them in main code when interrupts are disabled
 .def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
 .def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
+#if !defined(NOCONFIG)
 .def	OSCCAL_nom	=	r10	; preserve here Factory value for nominal freq
+#endif
 
 .DSEG
 .ORG 0x60
@@ -89,6 +99,8 @@
 buff_addr1:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_addr2:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_data:		.BYTE 6	; We have 6 symbols to print
+
+#if !defined(NOCONFIG)
 Configuration_settings:	; From here  starts SRAM, that will be preserved in EEPROM
 TV_line_start:	.BYTE 2	; Line number where we start print data (Configurable)
 TV_col_start:	.BYTE 1	; Column number where to start print data (Configurable). 
@@ -104,6 +116,7 @@ EE_TV_line_start:	.DW 0
 EE_TV_col_start:	.DB 0
 EE_Bat_correction:	.DB 0 
 EE_Bat_low_volt:	.DB 0
+#endif
 
 .CSEG
 .ORG 0
@@ -115,15 +128,21 @@ EE_Bat_low_volt:	.DB 0
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
+#if !defined(NOCONFIG)
 		mov adc_cntr,z1	;Watchdog Interrupt Handler. just update adc variable, because WDT only enabled in Command mode, so, no ADC readings occur
+#else
+		reti
+#endif
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
 .include "adc.inc"
 .include "tvout.inc"
+#if !defined(NOCONFIG)
 .include "s_uart.inc"
 .include "eeprom.inc"
 .include "watchdog.inc"
+#endif
 
 RESET:
 		ldi tmp, low(RAMEND); Main program start
@@ -138,21 +157,27 @@ RESET:
 		ldi lowbat_cntr, 254	; We want to start this counter to make a delay for voltage stabilizing
 		;mov voltage_min, lowbat_cntr	; store big (255) value. Variable will be updated later
 		mov sym_H_cntr, z1	; init variable
+#if !defined(NOCONFIG)
 		in OSCCAL_nom, OSCCAL		; preserve nominal frequency calibration value
+#endif
 		
 		; change speed (ensure 9.6 mhz ossc)
 		ldi tmp, 1<<CLKPCE	
 		out CLKPR, tmp		; enable clock change
 		out CLKPR, z0		; prescaler 1
 		
+#if !defined(NOCONFIG)
 		rcall WDT_off		; just in case it left on after software reset
+#endif
 
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
 		; Enable pullup on Configure Pin. We will enter configure mode if this pin will go LOW (by PCINT interrupt)
 		sbi	PORTB, CONF_PIN
 		
+#if !defined(NOCONFIG)
 		rcall EEPROM_read_settings
+#endif
 		
 		;initialize INT0 
 		; INT0 - H VIDEO Sync
@@ -189,9 +214,11 @@ main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
 
 
+#if !defined(NOCONFIG)
 		; Do we need to enter Configure mode?
 		sbis PINB, CONF_PIN
 		rcall EnterCommandMode
+#endif
 		sleep
 		cpi TV_lineL, 30		; first 30 lines is non-printing lines. Timing there is not critical
 		cpc TV_lineH, z0
@@ -201,7 +228,7 @@ main_loop:
 		rcall ReadVoltage
 		rjmp main_loop				
 		
-
+#if !defined(NOCONFIG)
 OverclockMCU:
 		; overclock cpu from 9.6mhz
 		; need to do it slowly
@@ -226,3 +253,15 @@ SlowdownMCU:
 		breq OSC_exit	; already slow
 		ldi tmp1, 255
 		rjmp OSC_gen
+#else
+OverclockMCU:
+		; overclock cpu from 9.6mhz
+		; need to do it slowly
+		in tmp2, OSCCAL
+		ldi tmp, OVERCLOCK_VAL
+OSC_ch:	inc tmp2
+		out OSCCAL, tmp2
+		dec tmp
+		brne OSC_ch
+		ret
+#endif

@@ -15,8 +15,8 @@
 ; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
 
 
- Factory_data:	.DW FIRST_PRINT_TV_LINE			; TV Line to print 
-				.DB FIRST_PRINT_TV_COLUMN, 0	; TV Col to print and voltage offset
+ Factory_data:	.DW FIRST_PRINT_VOLT_LINE		; TV Line to print volts
+				.DB FIRST_PRINT_VOLT_COLUMN, BAT_CORRECTION	; TV Col to print and voltage offset
 				.DB LOW_BAT_VOLTAGE, 0 			; last 0 is padding byte - no meaning
 
 ; tmp is value

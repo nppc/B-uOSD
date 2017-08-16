@@ -76,12 +76,21 @@ EXT_INT0:
 		; HSOUT horisontal line routine
 		adiw TV_lineH:TV_lineL, 1	; inc TV_lineL:TV_lineH
 		; preload delay value for horizontal positioning
-		lds	itmp, TV_col_start
+#if !defined(NOCONFIG)
+		lds	itmp, TV_col_start				; use preconfigured value
+#else
+		ldi itmp, FIRST_PRINT_VOLT_COLUMN	; use precompiled value
+#endif
 		; check current line number (we are using YH:YL just for sake of use adiw next)
 		ldi XL, low(buff_addr1)	; By default - first voltage to print
 		clr XH
+#if !defined(NOCONFIG)
 		lds YL, TV_line_start
 		lds YH, TV_line_start+1
+#else
+		ldi YL, low(FIRST_PRINT_VOLT_LINE)
+		ldi YH, high(FIRST_PRINT_VOLT_LINE)
+#endif
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brlo pcint_exit1			; not needed to print yet
