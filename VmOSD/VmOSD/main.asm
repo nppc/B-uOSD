@@ -38,19 +38,13 @@
 ;********** Show PILOT NAME on OSD *************
 ;** To enable this feature, uncomment it here **
 #define PILOTNAME	; This feature can't work together with CONFIG feature
-; Also define needed letters (not more than 10) and construct a string from them under .ORG PilotNameCharsAddrs
+; Also define needed letters (not more than 10) and construct a string from them at the end of this file
 #if defined(PILOTNAME)
 #define SYM_P
 #define SYM_A
 #define SYM_V
 #define SYM_E
 #define SYM_L
-.CSEG
-.ORG PilotNameCharsAddrs ; Put this block to the end of the code
-	; Here we have 10 bytes of data. But remember, first 8 chars printed with 7 bit width, 9th char is 2 bits, 10th is again 7 bit.
-	; So, to use all 10 bytes in the name, you should put 9th char as dot or space (for example "BADPILOT 1" or "BADPILOT.1")
-	.DB symP,symA,symV,symE,symL,symspc,symspc,symspc,symspc,symspc						
-
 #endif
 	
 
@@ -308,12 +302,15 @@ FillPilotNameBuffer:
 		ldi ZH, high(PilotNameCharsAddrs << 1)
 		ldi YL, low(buff_addr3)
 		clr YH
-		ldi, tmp, PILOTNAME_LEN + 2
+		ldi tmp, PILOTNAME_LEN + 2
 FPNB1:	lpm tmp1, Z+
 		st Y+, tmp1
 		dec tmp
 		brne FPNB1
 		ret
 
-PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name (We have it at the beginning of the code.
+PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name
+	; Here we have 10 bytes of data. But remember, first 8 chars printed with 7 bit width, 9th char is 2 bits, 10th is again 7 bit.
+	; So, to use all 10 bytes in the name, you should put 9th char as dot or space (for example "BADPILOT 1" or "BADPILOT.1")
+	.DB symP,symA,symV,symE,symL,symspc,symspc,symspc,symspc,symspc						
 #endif
