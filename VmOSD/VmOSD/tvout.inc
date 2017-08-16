@@ -71,25 +71,43 @@ EXT_INT0:
 		; OK exit
 		sbis PINB, VSOUT_PIN
 		rjmp vsout_newpage
-		; first voltage is double stretched
-		ldi sym_H_strch, SYMBOL_STRETCH	; Double stretch
 		; HSOUT horisontal line routine
 		adiw TV_lineH:TV_lineL, 1	; inc TV_lineL:TV_lineH
+		clr XH	; SRAM pointer. Only XL will change, so prepare XH for 16 bit operations
+
+#if defined(PILOTNAME)
+		ldi sym_H_strch, 1		; no stretch for Pilot Name
+		ldi itmp1, PILOTNAME_LEN + 2	; define number of bytes to print
+		ldi itmp, PRINT_PILOT_COLUMN	; column to print Pilot Name
+		ldi XL, low(buff_addr3)	; SRAM pointer. Pilot Name to print
+		ldi YL, low(PRINT_PILOT_LINE)
+		ldi YH, high(PRINT_PILOT_LINE)
+		cp TV_lineL, YL
+		cpc TV_lineH, YH
+		brlo pcint_exit1			; not needed to print yet
+		; calculate last line to print
+		adiw YH:YL, SYM_HEIGHT ;* SYMBOL_STRETCH	; no double height symbols
+		cp TV_lineL, YL
+		cpc TV_lineH, YH
+		brlo printing		; printing Pilot Name...
+#endif
+		; first voltage is double stretched
+		ldi sym_H_strch, SYMBOL_STRETCH	; Double stretch
+		ldi itmp1, 6		; define number of bytes to print
 		; preload delay value for horizontal positioning
 #if !defined(NOCONFIG)
 		lds	itmp, TV_col_start				; use preconfigured value
 #else
-		ldi itmp, FIRST_PRINT_VOLT_COLUMN	; use precompiled value
+		ldi itmp, PRINT_VOLT_COLUMN	; use precompiled value
 #endif
+		ldi XL, low(buff_addr1)	; SRAM pointer. First voltage to print
 		; check current line number (we are using YH:YL just for sake of use adiw next)
-		ldi XL, low(buff_addr1)	; By default - first voltage to print
-		clr XH
 #if !defined(NOCONFIG)
 		lds YL, TV_line_start
 		lds YH, TV_line_start+1
 #else
-		ldi YL, low(FIRST_PRINT_VOLT_LINE)
-		ldi YH, high(FIRST_PRINT_VOLT_LINE)
+		ldi YL, low(PRINT_VOLT_LINE)
+		ldi YH, high(PRINT_VOLT_LINE)
 #endif
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
@@ -112,7 +130,7 @@ EXT_INT0:
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brsh pcint_refill_buffer		; text is printed, refill buffers
-		ldi XL, low(buff_addr2)	; we need to print second voltage
+		ldi XL, low(buff_addr2)	; SRAM pointer. We need to print second voltage
 		subi itmp, 4	; adjust delay for proper horizontal position of second voltage
 #else
 		; No need to print second line
@@ -136,21 +154,21 @@ tmrcpl1:dec	itmp
 		ldi YL, low(buff_data)
 		clr YH
 		clr ZH
-		ldi itmp1, 6	; bytes to copy
+		mov itmp2, itmp1	; bytes to copy
 cpybuff:ld ZL, X+
 		add ZL, sym_line_nr		; go to current line in char bitmap
 		lpm	itmp, Z
 		st Y+, itmp
-		dec itmp1
+		dec itmp2
 		brne cpybuff
 		
 		; now time to start printing
 		ldi XL, low(buff_data)		; Character bits (updated for every line)
 		;clr XH	; not needed. It was cleared before
-		ldi itmp1, 6	; 6 characters to print
+		;itmp1 already has quantity of chars to print
 		clr itmp2		; bitmap line
 		ld itmp, X+		; get line of the first symbol 
-		; we have symbols with variable width (bitmap is 8 bits, dot is 2 bits. Other symbols 5 bits)
+		; we have symbols with variable width (bitmap is 8 bits, dot is 2 bits. Other symbols 7 bits)
 		; first symbol is a bitmap, so print full at the first iteration
 		
 		; print one char line		
@@ -251,7 +269,7 @@ clear_num_addr_buffer:
 		st Z+, itmp
 		ldi itmp, low(symspc << 1)		; space
 clr_rb:	st Z+, itmp
-		cpi ZL, low(buff_addr1)+12		; clear 2 buffers
+		cpi ZL, low(buff_addr1)+12		; clear 2 buffers (in case of Pilot Name we will not clear buffer, because we not change it)
 		brlo clr_rb
 		ret
 

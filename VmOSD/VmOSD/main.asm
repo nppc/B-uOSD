@@ -34,10 +34,28 @@
 ;********* CONFIGURATION disable **************
 ;** Removes support for serial configuration **
 #define NOCONFIG
+
+;********** Show PILOT NAME on OSD *************
+;** To enable this feature, uncomment it here **
+#define PILOTNAME	; This feature can't work together with CONFIG feature
+; Also define needed letters (not more than 10) and construct a string from them under .ORG PilotNameCharsAddrs
+#if defined(PILOTNAME)
+#define SYM_P
+#define SYM_A
+#define SYM_V
+#define SYM_E
+#define SYM_L
+.CSEG
+.ORG PilotNameCharsAddrs ; Put this block to the end of the code
+	; Here we have 10 bytes of data. But remember, first 8 chars printed with 7 bit width, 9th char is 2 bits, 10th is again 7 bit.
+	; So, to use all 10 bytes in the name, you should put 9th char as dot or space (for example "BADPILOT 1" or "BADPILOT.1")
+	.DB symP,symA,symV,symE,symL,symspc,symspc,symspc,symspc,symspc						
+
+#endif
 	
 
 ;---- END of configurable defines ----
- 
+
  ; at 9.6mhz, 10 cycles = 1us
 .EQU	OVERCLOCK_VAL	= 24		; How much to add to OSCCAL for overclocking
 									; 8 is about 10.4 mhz.
@@ -50,17 +68,25 @@
 ; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)
 
-
-.EQU	FIRST_PRINT_VOLT_LINE 	= 240	; Line where we start to print
-.EQU	FIRST_PRINT_VOLT_COLUMN = 140	; Column where we start to print
-.EQU	VOLT_DIV_CONST			= 186	; To get this number use formula (for 4S max): 
+; Predefined configurable parameters
+.EQU	PRINT_VOLT_LINE 	= 240	; Line where we start to print
+.EQU	PRINT_VOLT_COLUMN	= 140	; Column where we start to print
+.EQU	LOW_BAT_VOLTAGE		= 105	; means 10.5 volts
+.EQU	BAT_CORRECTION		= 0		; Signed value for correction voltage readings
+#if defined(PILOTNAME)
+.EQU	PRINT_PILOT_LINE 	= 40	; Line where we start to print
+.EQU	PRINT_PILOT_COLUMN	= 100	; Column where we start to print
+.EQU	PILOTNAME_LEN 		= 8		; Length of Pilot Name. - don't change this...
+#endif
+; If you did not changed hardware, then you don't need to change this...
+.EQU	VOLT_DIV_CONST		= 186	; To get this number use formula (for 4S max): 
 										; 4095/(Vmax*10)*8, where Vmax=(R1+R2)*Vref/R2, where Vref=1.1v 
 										; and resistor values is from divider (15K/1K)
 										; Vmax=(15+1)*1.1/1=17.6
 										; 4095/(17.6*10)*8=186
 										; For resistors 20K/1K constant will be 141 (max 5S battery). 
-.EQU	LOW_BAT_VOLTAGE			= 105	; means 10.5 volts
-.EQU	BAT_CORRECTION			= 0		; Signed value for correction voltage readings
+
+; END OF predefined configurable parameters
 										
 .EQU	VSOUT_PIN	= PB2	; Vertical sync pin
 .EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
@@ -98,7 +124,12 @@
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
 buff_addr1:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_addr2:		.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+#if defined(PILOTNAME)
+buff_addr3:		.BYTE PILOTNAME_LEN + 2	; We need 2 more symbols for reusing numbers printing routine (.N)
+buff_data:		.BYTE PILOTNAME_LEN + 2	; We need 2 more symbols for reusing numbers printing routine (.N)
+#else
 buff_data:		.BYTE 6	; We have 6 symbols to print
+#endif
 
 #if !defined(NOCONFIG)
 Configuration_settings:	; From here  starts SRAM, that will be preserved in EEPROM
@@ -198,6 +229,10 @@ RESET:
 		
 		rcall OverclockMCU
 
+#if defined(PILOTNAME)		
+		rcall FillPilotNameBuffer
+#endif
+
 		; Wait for voltage stabilizing and ADC warmup
 strt_wt:sbic ADCSRA, ADSC
 		rjmp strt_wt
@@ -254,6 +289,7 @@ SlowdownMCU:
 		ldi tmp1, 255
 		rjmp OSC_gen
 #else
+; If no CINFIG feature, then we need only OverclockMCU function
 OverclockMCU:
 		; overclock cpu from 9.6mhz
 		; need to do it slowly
@@ -264,4 +300,20 @@ OSC_ch:	inc tmp2
 		dec tmp
 		brne OSC_ch
 		ret
+#endif
+
+#if defined(PILOTNAME)
+FillPilotNameBuffer:
+		ldi ZL, low(PilotNameCharsAddrs << 1)
+		ldi ZH, high(PilotNameCharsAddrs << 1)
+		ldi YL, low(buff_addr3)
+		clr YH
+		ldi, tmp, PILOTNAME_LEN + 2
+FPNB1:	lpm tmp1, Z+
+		st Y+, tmp1
+		dec tmp
+		brne FPNB1
+		ret
+
+PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name (We have it at the beginning of the code.
 #endif
