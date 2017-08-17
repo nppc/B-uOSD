@@ -65,11 +65,11 @@
 ; Predefined configurable parameters
 .EQU	PRINT_VOLT_LINE 	= 240	; Line where we start to print
 .EQU	PRINT_VOLT_COLUMN	= 140	; Column where we start to print
-.EQU	LOW_BAT_VOLTAGE		= 105	; means 10.5 volts
+.EQU	LOW_BAT_VOLTAGE		= 30	; means 10.5 volts
 .EQU	BAT_CORRECTION		= 0		; Signed value for correction voltage readings
 #if defined(PILOTNAME)
 .EQU	PRINT_PILOT_LINE 	= 40	; Line where we start to print
-.EQU	PRINT_PILOT_COLUMN	= 100	; Column where we start to print
+.EQU	PRINT_PILOT_COLUMN	= 60	; Column where we start to print
 .EQU	PILOTNAME_LEN 		= 8		; Length of Pilot Name. - don't change this...
 #endif
 ; If you did not changed hardware, then you don't need to change this...
@@ -312,5 +312,5 @@ FPNB1:	lpm tmp1, Z+
 PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name
 	; Here we have 10 bytes of data. But remember, first 8 chars printed with 7 bit width, 9th char is 2 bits, 10th is again 7 bit.
 	; So, to use all 10 bytes in the name, you should put 9th char as dot or space (for example "BADPILOT 1" or "BADPILOT.1")
-	.DB symP,symA,symV,symE,symL,symspc,symspc,symspc,symspc,symspc						
+	.DB symP<<1,symA<<1,symV<<1,symE<<1,symL<<1,symspc<<1,symspc<<1,symspc<<1,symspc<<1,symspc<<1						
 #endif
