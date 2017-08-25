@@ -124,7 +124,7 @@ RESET:
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 254	; We want to start this counter to make a delay for voltage stabilizing
 		;mov voltage_min, lowbat_cntr	; store big (255) value. Variable will be updated later
-		mov sym_H_cntr, z1	; init variable
+		mov sym_H_cntr, z0	; init variable. If 0 then we need update it.
 		
 		; change speed (ensure 9.6 mhz ossc)
 		ldi tmp, 1<<CLKPCE	
@@ -220,7 +220,7 @@ OSDdata:
 	; print min voltage
 	.DB buff_min_volt, 0	; buffer from where to print data, len of the printed text (0 means print voltage)
 	.DB 140, 1	; column to print and Symbol stretch (1 or 2)
-	.DW 260	; line to print
+	.DW 270	; line to print
 	
 PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name
 	; Here we have 10 bytes of data. 

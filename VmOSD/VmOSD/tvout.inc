@@ -56,7 +56,7 @@ vsout_newpage:
 		ldi ZH, HIGH(OSDdata << 1)
 		rjmp pcint_exit		; exit
 		
-; short way for brne commands and also resets sym_line_nr for proper printing of next line
+; resets sym_line_nr for proper printing of next line
 pcint_exit1:
 		; should we advance Z pointer to the next block?
 		cp sym_line_nr, z0
@@ -64,7 +64,6 @@ pcint_exit1:
 		; advance to the next OSD block
 		adiw ZH:ZL, 6		; Every OSD block data is 6 bytes long
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
-		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
 		; decide, should we refill buffers?
 		ldi itmp, HIGH((OSDdata << 1) + OSDdataLen)
 		cpi ZL, LOW((OSDdata << 1) + OSDdataLen)
@@ -210,10 +209,13 @@ TV_dot:	bst itmp,1				;1
 
 TVprnExit:		
 		sbi	PORTB, CONF_PIN		; restore back pullup for Configure pin
-		dec sym_H_cntr
+		; update sym_H_cntr if needed
+		cp sym_H_cntr, z0
+		brne skp2
+		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
+skp2:	dec sym_H_cntr
 		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 		inc sym_line_nr	; go to next line of symbol
-		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
 
 pcint_exit:
 		out SREG, r_sreg
