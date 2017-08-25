@@ -182,9 +182,9 @@ strt_wt:sbic ADCSRA, ADSC
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
 		sleep
-		nop
-		cp sym_line_nr, z0		; read ADC while not printing
-		brne main_loop		; only read adc while first non-printing TV lines
+		cpi TV_lineL, 20		; first 20 lines is normally non-printing lines. Timing there is not critical
+		cpc TV_lineH, z0
+		brsh main_loop		; only read adc while first non-printing TV lines
 		; read ADSC bit to see if conversion finished
 		sbis ADCSRA, ADSC
 		rcall ReadVoltage
@@ -215,7 +215,7 @@ FPNB1:	lpm tmp1, Z+
 		ret
 
 ; need to adjust here data to print
-.EQU	OSDdataLen	= 3 * 8	; 3 sections by 8 bytes each
+.EQU	OSDdataLen	= 5 * 8	; 5 sections by 8 bytes each
 OSDdata:
 	; print Name (10 symbols max)
 	.DB buff_name, 5		; buffer from where to print data, len of the printed text (6 for voltage)
@@ -226,14 +226,14 @@ OSDdata:
 	; print timer
 	.DB buff_timer, 5		; buffer from where to print data, len of the printed text (6 for voltage)
 	.DB 3, 0				; dot position from right (0 for text), reserved
-	.DB 64, 1				; column to print and Symbol stretch (1 or 2)
+	.DB 62, 1				; column to print and Symbol stretch (1 or 2)
 	.DW 55					; line to print
 
 	; print crosshair
 	.DB buff_cross, 1		; buffer from where to print data, len of the printed text (6 for voltage)
 	.DB 0, 0				; dot position from right (0 for text), reserved
-	.DB 70, 1				; column to print and Symbol stretch (1 or 2)
-	.DW 140					; line to print
+	.DB 103, 1				; column to print and Symbol stretch (1 or 2)
+	.DW 155					; line to print
 
 	; print current voltage
 	.DB buff_cur_volt, 6	; buffer from where to print data, len of the printed text (6 for voltage)
