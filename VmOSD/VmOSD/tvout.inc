@@ -11,8 +11,7 @@
 ; * this text shall be included in all
 ; * copies or substantial portions of the Software.
 ; *
-; * You should have received a copy of the GNU General Public License
-; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+; * See <http://www.gnu.org/licenses/>.
 
 
 ; We need to do complicated math after text is printed.
@@ -40,10 +39,12 @@ vsonb:	;convert voltage to addresses of chars to print
 		rjmp pcint_exit		; leave spaces in buffer
 		ldi ZL, low(buff_cur_volt)+3	; point to the first digit position (+1) 
 		mov itmp, voltage	; number to convert
-		rcall conv_num_bcd
+		rcall conv_voltage_bcd
 		ldi ZL, low(buff_min_volt)+3	; point to the first digit position (+1) 
 		mov itmp, voltage_min	; number to convert
-		rcall conv_num_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
+		rcall conv_voltage_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
+		cpse timer_flag, z1			; only fill timer buffer, when flag is 0
+		rcall conv_timer_bcd		; Fill SRAM buffer with timer value
 pcint_ext2:
 		rjmp pcint_exit
 
@@ -62,7 +63,7 @@ pcint_exit1:
 		cp sym_line_nr, z0
 		breq pcint_ext2
 		; advance to the next OSD block
-		adiw ZH:ZL, 6		; Every OSD block data is 6 bytes long
+		adiw ZH:ZL, 8		; Every OSD block data is 8 bytes long
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
 		; decide, should we refill buffers?
 		ldi itmp, HIGH((OSDdata << 1) + OSDdataLen)
@@ -80,16 +81,6 @@ pcint_exit1:
 ; VSOUT: ---------------------+___________________+------
 EXT_INT0:
 		in r_sreg, SREG
-		; OK check VSOUT pin is LOW (New Page)
-		; OK if no, then 
-		; OK	increment line counter
-		; OK	(timing for printing data should be very precise)
-		; OK	if line number < line where data starts, then exit
-		; OK	if line number > totl lines to print, then exit 
-		; OK	Print OSD
-		; OK if yes, then
-		; OK initialize for new page (lines counter, fill sram with address of printed symbols...)
-		; OK exit
 		sbis PINB, VSOUT_PIN
 		rjmp vsout_newpage
 		; HSOUT horisontal line routine
@@ -98,18 +89,14 @@ EXT_INT0:
 		clr XH				; SRAM pointer. Only XL will change, so prepare XH for 16 bit operations
 		lpm XL, Z+			; SRAM pointer.
 		lpm itmp1, Z+		; bytes to print. If 0 then print number (6 bytes), take care of it later
-		clr osd_dot_pos		; For text we dont need a dot.
-		cp itmp1, z0
-		brne skp1
-		ldi itmp1, 6		; bytes for printing number (not related to OSD block data)
-		inc osd_dot_pos
-		inc osd_dot_pos		; for numbers it is 2.
-skp1:	lpm itmp, Z+		; column
+		lpm osd_dot_pos, Z+	; Dot position in the nubers
+		adiw ZH:ZL, 1		; reserved byte
+		lpm itmp, Z+		; column
 		lpm sym_H_strch, Z+	
 		lpm YL, Z+			; line
 		lpm YH, Z+			; line
 		;revert back Z pointer
-		sbiw ZH:ZL, 6		; Every OSD block data is 6 bytes long
+		sbiw ZH:ZL, 8		; Every OSD block data is 8 bytes long
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
 		brlo pcint_ext2			; not needed to print yet, just exit
@@ -223,7 +210,7 @@ pcint_exit:
 
 		
 ; convert number and store to SRAM digit addresses
-conv_num_bcd:
+conv_voltage_bcd:
 		ldi itmp1, 100
 		rcall conv_d_bcd
 		cp itmp2, z0	;	remove leading zero
@@ -237,6 +224,29 @@ clear0:	ldi itmp1, 10
 		st Z+, itmp2
 		ldi itmp1, low(symdot << 1)
 		st Z+, itmp1
+		mov itmp2, itmp
+		rcall conv_bcd_to_address
+		st Z+, itmp2
+		ret
+
+; convert time and store to SRAM digit addresses
+conv_timer_bcd:
+		ldi ZL, low(buff_timer)	; point to the first digit position
+		mov itmp, timer_mins
+		ldi itmp1, 10
+		rcall conv_d_bcd
+		rcall conv_bcd_to_address
+		st Z+, itmp2
+		mov itmp2, itmp
+		rcall conv_bcd_to_address
+		st Z+, itmp2
+		ldi itmp1, low(symcoln << 1)
+		st Z+, itmp1
+		mov itmp, timer_secs
+		ldi itmp1, 10
+		rcall conv_d_bcd
+		rcall conv_bcd_to_address
+		st Z+, itmp2
 		mov itmp2, itmp
 		rcall conv_bcd_to_address
 		st Z+, itmp2

@@ -11,8 +11,7 @@
 ; * this text shall be included in all
 ; * copies or substantial portions of the Software.
 ; *
-; * You should have received a copy of the GNU General Public License
-; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+; * See <http://www.gnu.org/licenses/>.
 
 .include "tn13Adef.inc"
 
@@ -85,12 +84,16 @@
 .def	adc_sumL	=	r8	; accumulated readings of ADC (sum of 64 values)
 .def	adc_sumH	=	r9	; accumulated readings of ADC (sum of 64 values)
 .def	osd_dot_pos	=	r10	; Position of the dot(.) in printed line. For numbers it is 2. For text it is 0.
+.def	timer_flag	=	r11	; not 0 if we need to advance the timer
+.def	timer_secs	=	r12	; Seconds of the timer
+.def	timer_mins	=	r13	; Seconds of the timer
 
 .DSEG
 .ORG 0x60
 ; we need buffer in SRAM for printing numbers (total 4 bytes with dot)
 buff_cur_volt:	.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
 buff_min_volt:	.BYTE 6	; We have 6 symbols to print. Bitmap, space, voltage (nn.n)
+buff_timer:		.BYTE 5	; 5 symbols for timer 00:00
 buff_cross:		.BYTE 1
 buff_name:		.BYTE BUFFER_LEN
 buff_data:		.BYTE BUFFER_LEN
@@ -105,12 +108,13 @@ buff_data:		.BYTE BUFFER_LEN
 		reti	;rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
-		reti
+		inc timer_flag	;rjmp WATCHDOG
 		reti	;rjmp ADC ; ADC Conversion Handler
 
 .include "font.inc"		; should be first line after interrupts vectors
 .include "adc.inc"
 .include "tvout.inc"
+.include "timer.inc"
 
 RESET:
 		ldi tmp, low(RAMEND); Main program start
@@ -156,6 +160,10 @@ RESET:
 		rcall OverclockMCU
 
 		rcall FillPilotNameBuffer
+		
+		; fill CrossHair symbol SRAM Buffer
+		ldi tmp, (symCross << 1)
+		sts buff_cross, tmp
 
 		; Wait for voltage stabilizing and ADC warmup
 strt_wt:sbic ADCSRA, ADSC
@@ -167,18 +175,20 @@ strt_wt:sbic ADCSRA, ADSC
 		; now our voltage and voltage_min is messed. Lets reset at least voltage_min.
 		ldi voltage_min, 255
 		
+		rcall WDT_Start	; start timer
+		
 		sei ; Enable interrupts
 
 main_loop:
 		; in the main loop we can run only not timing critical code like ADC reading
 		sleep
-		; need to rework this 30...
-		cpi TV_lineL, 30		; first 30 lines is non-printing lines. Timing there is not critical
-		cpc TV_lineH, z0
-		brsh main_loop		; only read adc while first non-printing TV lines
+		nop
+		cp sym_line_nr, z0		; read ADC while not printing
+		brne main_loop		; only read adc while first non-printing TV lines
 		; read ADSC bit to see if conversion finished
 		sbis ADCSRA, ADSC
 		rcall ReadVoltage
+		rcall Timer
 		rjmp main_loop				
 		
 OverclockMCU:
@@ -205,23 +215,38 @@ FPNB1:	lpm tmp1, Z+
 		ret
 
 ; need to adjust here data to print
-.EQU	OSDdataLen	= 3 * 6	; 3 sections by 6 bytes each
+.EQU	OSDdataLen	= 3 * 8	; 3 sections by 8 bytes each
 OSDdata:
 	; print Name (10 symbols max)
-	.DB buff_name, 5	; buffer from where to print data, len of the printed text (0 means print voltage)
-	.DB 60, 1	; column to print and Symbol stretch (1 or 2)
-	.DW 40	; line to print
+	.DB buff_name, 5		; buffer from where to print data, len of the printed text (6 for voltage)
+	.DB 0, 0				; dot position from right (0 for text), reserved
+	.DB 60, 1				; column to print and Symbol stretch (1 or 2)
+	.DW 40					; line to print
+
+	; print timer
+	.DB buff_timer, 5		; buffer from where to print data, len of the printed text (6 for voltage)
+	.DB 3, 0				; dot position from right (0 for text), reserved
+	.DB 64, 1				; column to print and Symbol stretch (1 or 2)
+	.DW 55					; line to print
+
+	; print crosshair
+	.DB buff_cross, 1		; buffer from where to print data, len of the printed text (6 for voltage)
+	.DB 0, 0				; dot position from right (0 for text), reserved
+	.DB 70, 1				; column to print and Symbol stretch (1 or 2)
+	.DW 140					; line to print
 
 	; print current voltage
-	.DB buff_cur_volt, 0	; buffer from where to print data, len of the printed text (0 means print voltage)
-	.DB 140, 2	; column to print and Symbol stretch (1 or 2)
-	.DW 240	; line to print
+	.DB buff_cur_volt, 6	; buffer from where to print data, len of the printed text (6 for voltage)
+	.DB 2, 0				; dot position from right (0 for text), reserved
+	.DB 140, 2				; column to print and Symbol stretch (1 or 2)
+	.DW 240					; line to print
 
 	; print min voltage
-	.DB buff_min_volt, 0	; buffer from where to print data, len of the printed text (0 means print voltage)
-	.DB 140, 1	; column to print and Symbol stretch (1 or 2)
-	.DW 270	; line to print
+	.DB buff_min_volt, 6	; buffer from where to print data, len of the printed text (6 for voltage)
+	.DB 2, 0				; dot position from right (0 for text), reserved
+	.DB 140, 1				; column to print and Symbol stretch (1 or 2)
+	.DW 270					; line to print
 	
 PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name
-	; Here we have 10 bytes of data. 
-	.DB symP<<1,symA<<1,symV<<1,symE<<1,symL<<1,symspc<<1,symspc<<1,symspc<<1,symspc<<1,symspc<<1						
+	; Here we have max 10 bytes of data
+	.DB symP<<1,symA<<1,symV<<1,symE<<1,symL<<1,symspc<<1 ;,symspc<<1,symspc<<1,symspc<<1,symspc<<1						

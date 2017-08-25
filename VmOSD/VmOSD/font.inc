@@ -11,8 +11,7 @@
 ; * this text shall be included in all
 ; * copies or substantial portions of the Software.
 ; *
-; * You should have received a copy of the GNU General Public License
-; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+; * See <http://www.gnu.org/licenses/>.
 
 .EQU	SYM_HEIGHT 				= 10
  
@@ -349,6 +348,19 @@ sym9:	.DB 0b01111111, \
 			0b00000001, \
 			0b01111111, \
 			0b01111111
+			
+symCross:
+		.DB 0b00001000, \
+			0b00001000, \
+			0b00111110, \
+			0b00111110, \
+			0b01100011, \
+			0b01100011, \
+			0b00111110, \
+			0b00111110, \
+			0b00001000, \
+			0b00001000
+
 
 #if defined(BITMAP_NONE)
 symbitmap:	; if no bitmap needed, then just print a space
@@ -362,15 +374,17 @@ symdot:	.DB 0b00000000, \
 			0b00000000, \
 			0b00000000, \
 			0b00000000, \
+			0b00000000
+symcoln:.DB	0b00000000, \
+			0b00000000, \
+			0b00000011, \
+			0b00000011, \
 			0b00000000, \
 			0b00000000, \
 			0b00000000, \
 			0b00000011, \
-			0b00000011
-
-#if defined(BITMAP_NONE)
-symbitmap:	; if no bitmap needed, then just print a space
-#endif
+			0b00000011, \
+			0b00000000
 
 #if defined(BITMAP_COPTER)
 symbitmap:

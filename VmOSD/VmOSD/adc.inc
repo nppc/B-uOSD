@@ -11,8 +11,7 @@
 ; * this text shall be included in all
 ; * copies or substantial portions of the Software.
 ; *
-; * You should have received a copy of the GNU General Public License
-; * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
+; * See <http://www.gnu.org/licenses/>.
 
 
 ; ADC reading
