@@ -18,7 +18,7 @@
 
 ;***** BITMAP before voltage ******
 ;** uncomment one of the defines **
-;#define BITMAP_COPTER
+#define BITMAP_COPTER
 ;#define BITMAP_GOOGLES
 ;#define BITMAP_NONE
 	
