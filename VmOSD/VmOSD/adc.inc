@@ -54,11 +54,7 @@ adc_3:	; now we have reminder in adc_sumL. Lets add it to the final result
 		brlo adc_4
 		inc tmp2	; add 1 (actually it is 0.1) to the result if reminder is 0.5 or greather
 adc_4:	;apply voltage adjustment
-#if !defined(NOCONFIG)
-		lds tmp, Bat_correction
-#else
 		ldi tmp, BAT_CORRECTION
-#endif
 		add tmp2, tmp
 		; return voltage for OSD 
 		mov voltage, tmp2	; now we have beautiful result for printing
@@ -68,11 +64,7 @@ adc_4:	;apply voltage adjustment
 		mov voltage_min, voltage
 adc_nomin:
 		; check for low-voltage
-#if !defined(NOCONFIG)
-		lds tmp, Bat_low_volt
-#else
 		ldi tmp, LOW_BAT_VOLTAGE
-#endif
 		cp voltage, tmp 
 		brsh adc_exit
 		cpi lowbat_cntr, 255
