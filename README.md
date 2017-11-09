@@ -21,6 +21,8 @@ It has minuses too.
 - Due to small and slow mcu (no special mcu for signal generation) the OSD picture is not as stable as other bigger OSDs.
 - No shadow around the symbols (not visible on white background). Planned it rhe future releases.
 
+Discussion is here: https://www.rcgroups.com/forums/showthread.php?2985720-uOSD-World-smallest-micro-OSD
+
 Some screenshots:
 ![Sample Double height](Images/Assembled_MCU_side.jpg)
 ![Sample V2.0](Images/SampleV20.jpg)
