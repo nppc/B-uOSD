@@ -33,17 +33,30 @@
 									; PAL visible dots in 51.9us (498 cycles) or 166 dots at 9.6mhz
 ; PAL visible lines - 576 (interleased is half of that)
 
-; Predefined configurable parameters
-.EQU	LOW_BAT_VOLTAGE		= 30	; means 3.0 volts
-.EQU	BAT_CORRECTION		= 0		; Signed value for correction voltage readings
+;************ CONFIGURATION ***************
+; !!!!!This is user adjustable section!!!!!
 
-;********** Symbols for PILOT NAME *************
+; *** VOLTAGE SECTION
+; Low Battery voltage value. Below this voltage, OSD voltage will start to blink
+.EQU	LOW_BAT_VOLTAGE		= 30	; means 3.0 volts
+
+; If your multimeter measurement will be different from OSD measurement, then correction can be made here.
+; For example, if your multimeter shows, 11.5 volts, but OSD shows 11.7 volts, then enter here -2 (-0.2v).
+.EQU	BAT_CORRECTION		= 0		; Signed int8 value for voltage readings correction
+
+
+;*** PILOT NAME SYMBOLS
+; Define here all characters, that will be printed as a pilot name.
 #define SYM_P
 #define SYM_A
 #define SYM_V
 #define SYM_E
 #define SYM_L
-; END OF predefined configurable parameters
+
+;******************************************
+; Show/Hide OSD elements configured 
+; at the end of this file 
+;******* END OF CONFIGURATION PART 1 *********
 
 
 ; If you did not changed hardware, then you don't need to change this...
@@ -214,8 +227,16 @@ FPNB1:	lpm tmp1, Z+
 		brne FPNB1
 		ret
 
-; need to adjust here data to print
+
+;******* CONFIGURATION PART 2 *********		
+
+; *** HOW many elements is showed on OSD. 
+; For example, if you need to show 4 elements (Timer, Crosshair, Voltage nd Min Voltage) 
+; then EQU will look like this: OSDdataLen	= 4 * 8
 .EQU	OSDdataLen	= 5 * 8	; 5 sections by 8 bytes each
+
+; *** OSD Elements
+; Comment unneeded blocks
 OSDdata:
 	; print Name (10 symbols max)
 	.DB buff_name, 5		; buffer from where to print data, len of the printed text (6 for voltage)
@@ -247,6 +268,11 @@ OSDdata:
 	.DB 140, 1				; column to print and Symbol stretch (1 or 2)
 	.DW 270					; line to print
 	
-PilotNameCharsAddrs:	; Here we put Characters addresses of Pilot Name
-	; Here we have max 10 bytes of data
-	.DB symP<<1,symA<<1,symV<<1,symE<<1,symL<<1,symspc<<1 ;,symspc<<1,symspc<<1,symspc<<1,symspc<<1						
+
+; *** PILOTNAME STRING
+; maximum is 10 characters.	
+; If you don't need Pilot Name on OSD, then comment out the .DB line (PilotNameCharsAddrs: label should not be commented)
+PilotNameCharsAddrs:
+	.DB symP<<1,symA<<1,symV<<1,symE<<1,symL<<1,symspc<<1
+
+;*********** END OF CONFIGURATION *************
