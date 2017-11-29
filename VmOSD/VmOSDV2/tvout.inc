@@ -36,7 +36,7 @@ vsonb:	;convert voltage to addresses of chars to print
 		rcall clear_num_addr_buffer
 		; check for low-bat blinking
 		sbrs lowbat_cntr, 5	; check bit in running number if bit toggle, then we toggle voltage output
-		rjmp pcint_exit		; leave spaces in buffer
+		rjmp tvout_exit		; leave spaces in buffer
 		ldi ZL, low(buff_cur_volt)+3	; point to the first digit position (+1) 
 		mov itmp, voltage	; number to convert
 		rcall conv_voltage_bcd
@@ -45,23 +45,14 @@ vsonb:	;convert voltage to addresses of chars to print
 		rcall conv_voltage_bcd		; number digits addresses will be stored to the next 6 bytes of RAM
 		cpse timer_flag, z1			; only fill timer buffer, when flag is 0
 		rcall conv_timer_bcd		; Fill SRAM buffer with timer value
-pcint_ext2:
-		rjmp pcint_exit
-
-; new page routine
-vsout_newpage:
-		clr TV_lineL
-		clr TV_lineH
-		; initialize pointer for OSD print data structure
-		ldi ZL, LOW(OSDdata << 1)
-		ldi ZH, HIGH(OSDdata << 1)
-		rjmp pcint_exit		; exit
+tvout_exit2:
+		rjmp tvout_exit
 		
 ; resets sym_line_nr for proper printing of next line
-pcint_exit1:
+tvout_exit1:
 		; should we advance Z pointer to the next block?
 		cp sym_line_nr, z0
-		breq pcint_ext2
+		breq tvout_exit2
 		; advance to the next OSD block
 		adiw ZH:ZL, 8		; Every OSD block data is 8 bytes long
 		clr sym_line_nr	; Reset printing counter. Start printing from the first line of symbol bitmap
@@ -69,20 +60,12 @@ pcint_exit1:
 		ldi itmp, HIGH((OSDdata << 1) + OSDdataLen)
 		cpi ZL, LOW((OSDdata << 1) + OSDdataLen)
 		cpc ZH, itmp
-		brlo pcint_ext2
+		brlo tvout_exit2
 		rjmp pcint_refill_buffer
 		
-	
-; Here we come every time when Horizontal sync is came.
-; Per Datasheet it is good to use leading edge of the signal (falling)
-; we come here only when new TV line is started. 
-; So, we need to check VSOUT pin here to see, when new page will begin
-; HSOUT: -----+_+-----+_+-----+_+-----+_+-----+_+-----+_+
-; VSOUT: ---------------------+___________________+------
-EXT_INT0:
-		in r_sreg, SREG
-		sbis PINB, VSOUT_PIN
-		rjmp vsout_newpage
+
+; main TVOUT routine to print data on OSD		
+TVOUT:
 		; HSOUT horisontal line routine
 		adiw TV_lineH:TV_lineL, 1	; inc TV_lineL:TV_lineH
 
@@ -99,14 +82,14 @@ EXT_INT0:
 		sbiw ZH:ZL, 8		; Every OSD block data is 8 bytes long
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
-		brlo pcint_ext2			; not needed to print yet, just exit
+		brlo tvout_exit2			; not needed to print yet, just exit
 		; calculate last line to print
 		adiw YH:YL, SYM_HEIGHT ; no double height symbols
 		cpse sym_H_strch, r1
 		adiw YH:YL, SYM_HEIGHT ; double height symbols
 		cp TV_lineL, YL
 		cpc TV_lineH, YH
-		brsh pcint_exit1	; not need to print anymore, exit but check, do we need to refill buffers (end of OSD data)
+		brsh tvout_exit1	; not need to print anymore, exit but check, do we need to refill buffers (end of OSD data)
 		
 		
 printing:		
@@ -201,12 +184,11 @@ TVprnExit:
 		brne skp2
 		mov sym_H_cntr, sym_H_strch	; reset counter for symbol stretch
 skp2:	dec sym_H_cntr
-		brne pcint_exit	; skip sym_line_nr++ if sym_H_cntr not 0
+		brne tvout_exit	; skip sym_line_nr++ if sym_H_cntr not 0
 		inc sym_line_nr	; go to next line of symbol
 
-pcint_exit:
-		out SREG, r_sreg
-		reti
+tvout_exit:
+		ret
 
 		
 ; convert number and store to SRAM digit addresses

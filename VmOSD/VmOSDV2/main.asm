@@ -69,9 +69,9 @@
 .EQU	BUFFER_LEN	 		= 10	; Length of the SRAM buffers fro text printing. - don't change this...
 
 										
-.EQU	VSOUT_PIN	= PB2	; Vertical sync pin
-.EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
-.EQU	CONF_PIN	= PB0	; Pin for device Configuration
+.EQU	GRAY_PIN	= PB2	; Gray Background of symbols Pin
+;.EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
+;.EQU	CONF_PIN	= PB0	; Pin for device Configuration
 .EQU	VBAT_PIN	= PB3	; Resistor divider (15K/1K) for voltage measurement (4S max)
 .EQU	VIDEO_PIN	= PB4	; OSD Video OUT
 
@@ -100,6 +100,7 @@
 .def	timer_flag	=	r11	; not 0 if we need to advance the timer
 .def	timer_secs	=	r12	; Seconds of the timer
 .def	timer_mins	=	r13	; Seconds of the timer
+.def	is_h_sync 	=	r14 ; Flags for H/V sync detection 
 
 .DSEG
 .ORG 0x60
@@ -114,11 +115,11 @@ buff_data:		.BYTE BUFFER_LEN
 .CSEG
 .ORG 0
 		rjmp RESET ; Reset Handler
-		rjmp EXT_INT0 ; IRQ0 Handler
+		reti	;rjmp EXT_INT0 ; IRQ0 Handler
 		reti	;rjmp PCINT_int ; PCINT0 Handler
 		reti	;rjmp TIM0_OVF ; Timer0 Overflow Handler
 		reti	;rjmp EE_RDY ; EEPROM Ready Handler
-		reti	;rjmp ANA_COMP ; Analog Comparator Handler
+		rjmp ANA_COMP ; Analog Comparator Handler
 		reti	;rjmp TIM0_COMPA ; Timer0 CompareA Handler
 		reti	;rjmp TIM0_COMPB ; Timer0 CompareB Handler
 		inc timer_flag	;rjmp WATCHDOG
@@ -128,6 +129,7 @@ buff_data:		.BYTE BUFFER_LEN
 .include "adc.inc"
 .include "tvout.inc"
 .include "timer.inc"
+.include "analog.inc"
 
 RESET:
 		ldi tmp, low(RAMEND); Main program start
@@ -138,6 +140,7 @@ RESET:
 		clr z1
 		inc z1
 		;clr adc_cntr		; couter for ADC readings. No need to initialize. Anyway we give some time for ADC to initialize all variables and states
+		clr is_h_sync		; clear all H/V sync flags
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 254	; We want to start this counter to make a delay for voltage stabilizing
 		;mov voltage_min, lowbat_cntr	; store big (255) value. Variable will be updated later
@@ -150,16 +153,11 @@ RESET:
 		
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
-		; Enable pullup on Configure Pin. We will enter configure mode if this pin will go LOW (by PCINT interrupt)
-		sbi	PORTB, CONF_PIN
 		
-		;initialize INT0 
-		; INT0 - H VIDEO Sync
-		ldi tmp, 1<<ISC01 | 1<<ISC00 | 1<<SE	; falling edge, sleep mode enable
-		out MCUCR, tmp
-		ldi tmp, 1<<INT0 
-		out GIMSK, tmp
-				
+		; Configure Analog Comparator (Interrupt on rising edge of Output)
+		ldi tmp, 1<<ACIE | 1<<ACIS1 | 1<<ACIS0
+		out ACSR, tmp
+		
 		; Configure ADC
 		; Internal 1.1Vref, ADC channel, 10bit ADC result
 		ldi tmp, 1<<REFS0 | 1<<MUX0 | 1<<MUX1
@@ -167,8 +165,10 @@ RESET:
 		; normal mode (single conversion mode), 128 prescaler (about 75khz at 9.6mhz ossc).
 		ldi tmp, 1<<ADEN | 1<<ADSC | 1<<ADPS2 | 1<<ADPS1 | 1<<ADPS0
 		out ADCSRA, tmp
-		; turn off digital circuity in analog pin
-		sbi DIDR0, VBAT_PIN
+		
+		; turn off digital circuity on analog pins
+		ldi tmp, 1<<VBAT_PIN | 1<<AIN1D | 1<<AIN0D
+		out DIDR0, tmp
 		
 		rcall OverclockMCU
 
@@ -188,7 +188,15 @@ strt_wt:sbic ADCSRA, ADSC
 		; now our voltage and voltage_min is messed. Lets reset at least voltage_min.
 		ldi voltage_min, 255
 		
-		rcall WDT_Start	; start timer
+		;start HW timer for H/V sync detection
+		ldi tmp, 1<<WGM01
+		out TCCR0A, tmp							; CTC mode to reduce the resolution of timer to about 50us
+		ldi tmp, 0<<CS02 | 1<<CS01 | 0<<CS00	; 8 prescaller (at 13Mhz it overflows every 156us)
+		out TCCR0B, tmp
+		ldi tmp, 82
+		out OCR0A, tmp							; abotu 50us in CTC mode
+		
+		rcall WDT_Start	; start OSD timer
 		
 		sei ; Enable interrupts
 
