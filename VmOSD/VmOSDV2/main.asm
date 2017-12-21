@@ -190,11 +190,11 @@ strt_wt:sbic ADCSRA, ADSC
 		
 		;start HW timer for H/V sync detection
 		ldi tmp, 1<<WGM01
-		out TCCR0A, tmp							; CTC mode to reduce the resolution of timer to about 50us
+		out TCCR0A, tmp							; CTC mode to reduce the resolution of timer to measure 50us
 		ldi tmp, 0<<CS02 | 1<<CS01 | 0<<CS00	; 8 prescaller (at 13Mhz it overflows every 156us)
 		out TCCR0B, tmp
-		ldi tmp, 82
-		out OCR0A, tmp							; abotu 50us in CTC mode
+		ldi tmp, 82								; about 50us in CTC mode
+		out OCR0A, tmp
 		
 		rcall WDT_Start	; start OSD timer
 		
