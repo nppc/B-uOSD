@@ -1,5 +1,5 @@
 #!/bin/sh
-cd ../VmOSD/VmOSD/
+cd ../VmOSD/VmOSDV2/
 avra main.asm
 mv main.hex ../../Bin/B-uOSD_v2.hex
 rm main.cof
