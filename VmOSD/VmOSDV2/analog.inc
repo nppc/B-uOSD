@@ -47,8 +47,6 @@ ana_cmp_exit:
 		out SREG, r_sreg
 		reti
 
-	
-; TODO		
 ; new page routine
 vsout_newpage:
 		clr TV_lineL

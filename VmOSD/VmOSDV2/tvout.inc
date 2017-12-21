@@ -178,7 +178,6 @@ TV_dot:	bst itmp,1				;1
 		; ### END OF TV OUT ###
 
 TVprnExit:		
-		sbi	PORTB, CONF_PIN		; restore back pullup for Configure pin
 		; update sym_H_cntr if needed
 		cp sym_H_cntr, z0
 		brne skp2
