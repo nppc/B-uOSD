@@ -16,7 +16,7 @@ wt_calib:
 		andi tmp, 1<<WDTIF
 		brne wt_calib
 		; now lets see how much we got in timer0 counter
-		in tmp2, TCNT0
+		in tmp1, TCNT0
 		; we need to convert this number to about 50us at timer prescaller 8 
 		; the formula is:
 		;50us = 0.00005s
@@ -25,17 +25,17 @@ wt_calib:
 		;(512 * N) / 160 / 8
 		;8 * N / 20
 		;2*N/5
-		clr tmp1		; prepare high byte for 16 bit number
-		lsl tmp2		; multiply by 2
-		rol tmp1
+		clr tmp2		; prepare high byte for 16 bit number
+		lsl tmp1		; multiply by 2
+		rol tmp2
 		; div by 5
 		clr tmp 		; counter (result)
 wt_calib_div:
-		subi tmp2, 5
-		sbc tmp1, z0
+		subi tmp1, 5
+		sbc tmp2, z0
 		inc tmp
-		cpi tmp2,5
-		cpc tmp1, z0
+		cpi tmp1,5
+		cpc tmp2, z0
 		brsh wt_calib_div
 		; final value for OCR0A in tmp 
 		sei
