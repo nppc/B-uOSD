@@ -130,6 +130,7 @@ buff_data:		.BYTE BUFFER_LEN
 .include "tvout.inc"
 .include "timer.inc"
 .include "analog.inc"
+.include "calibration.inc"
 
 RESET:
 		ldi tmp, low(RAMEND); Main program start
@@ -193,7 +194,10 @@ strt_wt:sbic ADCSRA, ADSC
 		out TCCR0A, tmp							; CTC mode to reduce the resolution of timer to measure 50us
 		ldi tmp, 0<<CS02 | 1<<CS01 | 0<<CS00	; 8 prescaller (at 13Mhz it overflows every 156us)
 		out TCCR0B, tmp
-		ldi tmp, 82								; about 50us in CTC mode
+	
+		rcall OCR0A_Calibration	; get OCR0A value
+		; result is returned in tmp variable
+		;ldi tmp, 82								; about 50us in CTC mode
 		out OCR0A, tmp
 		
 		rcall WDT_Start	; start OSD timer

@@ -13,7 +13,6 @@
 ; *
 ; * See <http://www.gnu.org/licenses/>.
 
-
 WDT_Start:	; with interrupt behaviour
 		ldi   tmp1, (0<<WDE) | (1<<WDTIE) | (0<<WDP3) | (1<<WDP2) | (1<<WDP1) | (0<<WDP0)		; 1s
 WDT_Start_code:
