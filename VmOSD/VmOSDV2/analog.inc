@@ -21,6 +21,8 @@
 ; If timer overflows (more that 50us) then we captured first line
 
 ANA_COMP:
+		; test:
+		sbi PORTB, TEST_PIN ; turn on test LED
 		; we should be very accurate here with timing
 		in r_sreg, SREG
 		; first read capture flag and update is_h_sync flag
@@ -39,6 +41,8 @@ ANA_COMP:
 		; now check flags, did we got H/V syncs?
 		; if is_h_sync is 0, then we need to wait for new page (V sync).
 		; V syncs occurs multiple times, so, we need to wait while all short syncs (less than 50us) are gone.
+		; test
+		cbi PORTB, TEST_PIN ; turn off test LED
 		cp is_h_sync, z0
 		breq vsout_newpage	; reset h_line counter etc
 		; we are in printing area, so, proceed to tvout routine

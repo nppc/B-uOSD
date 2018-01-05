@@ -69,7 +69,7 @@
 .EQU	BUFFER_LEN	 		= 10	; Length of the SRAM buffers fro text printing. - don't change this...
 
 										
-.EQU	GRAY_PIN	= PB2	; Gray Background of symbols Pin
+.EQU	TEST_PIN	= PB2	; For testing purposes will output V/H sync
 ;.EQU	HSOUT_PIN	= PB1	; Horizontal sync pin (Seems CSOUT pin is more reliable)
 ;.EQU	CONF_PIN	= PB0	; Pin for device Configuration
 .EQU	VBAT_PIN	= PB3	; Resistor divider (15K/1K) for voltage measurement (4S max)
@@ -154,6 +154,9 @@ RESET:
 		
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
+		
+		; configure test pin as output
+		sbi	DDRB, TEST_PIN
 		
 		; Configure Analog Comparator (Interrupt on rising edge of Output)
 		ldi tmp, 1<<ACIE | 1<<ACIS1 | 1<<ACIS0
