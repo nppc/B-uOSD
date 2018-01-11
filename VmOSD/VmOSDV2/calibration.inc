@@ -6,8 +6,8 @@ OCR0A_Calibration:
 		cli					; we don't want any interrupts now
 		ldi tmp, 1<<CS02 | 0<<CS01 | 1<<CS00	; 1024 prescaller (at 13Mhz it overflows after about 20ms)
 		out TCCR0B, tmp
-		ldi itmp, 1<<PSR10
-		out GTCCR, itmp		; reset prescaller
+		ldi tmp, 1<<PSR10
+		out GTCCR, tmp		; reset prescaller
 		out TCNT0, z0		; reset timer counter
 		wdr					; reset watchdog
 		; now wait for watchdog interrupt flag
@@ -17,7 +17,19 @@ wt_calib:
 		brne wt_calib
 		; now lets see how much we got in timer0 counter
 		in tmp1, TCNT0
-		; we need to convert this number to about 50us at timer prescaller 8 
+
+		; store timer value to EEPROM for debugging
+		; Set Programming mode
+		ldi tmp, (0<<EEPM1)|(0<<EEPM0)
+		out EECR, tmp
+		; Set up address 
+		ldi tmp, 4
+		out EEARL, tmp
+		out EEDR,tmp1		; Write data
+		sbi EECR,EEMPE
+		sbi EECR,EEPE		
+		
+		; we need to convert this number to about 50us for a timer with prescaller 8 
 		; the formula is:
 		;50us = 0.00005s
 		;16ms = 0,016s
@@ -40,6 +52,10 @@ wt_calib_div:
 		; final value for OCR0A in tmp 
 
 		; store final value to EEPROM for debugging
+EEPROM_write:
+		; Wait for completion of previous write
+		sbic EECR,EEPE
+		rjmp EEPROM_write 
 		; Set Programming mode
 		ldi tmp1, (0<<EEPM1)|(0<<EEPM0)
 		out EECR, tmp1

@@ -100,7 +100,7 @@
 .def	timer_flag	=	r11	; not 0 if we need to advance the timer
 .def	timer_secs	=	r12	; Seconds of the timer
 .def	timer_mins	=	r13	; Seconds of the timer
-.def	is_h_sync 	=	r14 ; Flags for H/V sync detection 
+;.def	is_h_sync 	=	r14 ; Flags for H/V sync detection 
 
 .DSEG
 .ORG 0x60
@@ -141,7 +141,7 @@ RESET:
 		clr z1
 		inc z1
 		;clr adc_cntr		; couter for ADC readings. No need to initialize. Anyway we give some time for ADC to initialize all variables and states
-		clr is_h_sync		; clear all H/V sync flags
+		;clr is_h_sync		; clear all H/V sync flags
 		clr sym_line_nr		; first line of the char
 		ldi lowbat_cntr, 254	; We want to start this counter to make a delay for voltage stabilizing
 		;mov voltage_min, lowbat_cntr	; store big (255) value. Variable will be updated later

@@ -24,11 +24,10 @@ ANA_COMP:
 		; we should be very accurate here with timing
 		in r_sreg, SREG
 		; first read capture flag and update is_h_sync flag
-		mov is_h_sync, z0				; reset the flag
+		;mov is_h_sync, z0				; reset the flag
 		in itmp1, TIFR0
-		andi itmp1, 1<<OCF0A		; filter only needed bit
-		cpse itmp1, z0				; (compare and skip command if equal)if no capture ...
-		mov is_h_sync, z1			; ... then set the flag, because capture flag is set
+		;cpse itmp1, z0				; (compare and skip command if equal)if no capture ...
+		;mov is_h_sync, z1			; ... then set the flag, because capture flag is set
 		; we will use the timer without the interrupt. Just reset it every time we enter ANA_COMP
 		; restart the HW timer
 		ldi itmp, 1<<PSR10
@@ -39,8 +38,9 @@ ANA_COMP:
 		; now check flags, did we got H/V syncs?
 		; if is_h_sync is 0, then we need to wait for new page (V sync).
 		; V syncs occurs multiple times, so, we need to wait while all short syncs (less than 50us) are gone.
-		cp is_h_sync, z0
-		breq vsout_newpage	; reset h_line counter etc
+		;cp is_h_sync, z0
+		andi itmp1, 1<<OCF0A		; check for overflow flag. If set, then we are in printing area. (we check Z flag. Z flag is set, when OCF0A is 0)
+		breq vsout_newpage	; check Z flag and jump if 1...
 		; debug
 		cbi PORTB, TEST_PIN ; turn off test LED
 		; end debug
