@@ -38,5 +38,17 @@ wt_calib_div:
 		cpc tmp2, z0
 		brsh wt_calib_div
 		; final value for OCR0A in tmp 
+
+		; store final value to EEPROM for debugging
+		; Set Programming mode
+		ldi tmp1, (0<<EEPM1)|(0<<EEPM0)
+		out EECR, tmp1
+		; Set up address 
+		ldi tmp1, 5
+		out EEARL, tmp1
+		out EEDR,tmp		; Write data
+		sbi EECR,EEMPE
+		sbi EECR,EEPE		
+
 		sei
 		ret
