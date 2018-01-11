@@ -126,7 +126,7 @@ cpybuff:ld ZL, X+
 		ldi XL, low(buff_data)		; Character bits (updated for every line)
 		;clr XH	; not needed. It was cleared before
 		;itmp1 already has quantity of chars to print
-		clr itmp2		; bitmap line
+		in itmp2, PINB			; preserve other ports
 		ld itmp, X+		; get line of the first symbol 
 		; we have symbols with variable width (bitmap is 8 bits, dot is 2 bits. Other symbols 7 bits)
 		; first symbol is a bitmap, so print full at the first iteration
