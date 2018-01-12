@@ -14,7 +14,7 @@ OCR0A_Calibration:
 wt_calib:
 		in tmp, WDTCR
 		andi tmp, 1<<WDTIF
-		brne wt_calib
+		breq wt_calib
 		; now lets see how much we got in timer0 counter
 		in tmp1, TCNT0
 

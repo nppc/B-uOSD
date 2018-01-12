@@ -192,16 +192,15 @@ strt_wt:sbic ADCSRA, ADSC
 		; now our voltage and voltage_min is messed. Lets reset at least voltage_min.
 		ldi voltage_min, 255
 		
+		rcall OCR0A_Calibration	; get OCR0A value
+		; result is returned in tmp variable
+		;ldi tmp, 82								; about 50us in CTC mode
+		out OCR0A, tmp
 		;start HW timer for H/V sync detection
 		ldi tmp, 1<<WGM01
 		out TCCR0A, tmp							; CTC mode to reduce the resolution of timer to measure 50us
 		ldi tmp, 0<<CS02 | 1<<CS01 | 0<<CS00	; 8 prescaller (at 13Mhz it overflows every 156us)
 		out TCCR0B, tmp
-	
-		rcall OCR0A_Calibration	; get OCR0A value
-		; result is returned in tmp variable
-		;ldi tmp, 82								; about 50us in CTC mode
-		out OCR0A, tmp
 		
 		rcall WDT_Start	; start OSD timer
 		
