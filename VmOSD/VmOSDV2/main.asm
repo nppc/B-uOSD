@@ -154,10 +154,7 @@ RESET:
 		
 		; Configure Video pin as OUTPUT (LOW)
 		sbi	DDRB, VIDEO_PIN
-		
-		; configure test pin as output
-		sbi	DDRB, TEST_PIN
-		
+				
 		; Configure Analog Comparator (Interrupt on rising edge of Output)
 		ldi tmp, 1<<ACIE | 1<<ACIS1 | 1<<ACIS0
 		out ACSR, tmp
@@ -245,9 +242,9 @@ FPNB1:	lpm tmp1, Z+
 ;******* CONFIGURATION PART 2 *********		
 
 ; *** HOW many elements is showed on OSD. 
-; For example, if you need to show 4 elements (Timer, Crosshair, Voltage nd Min Voltage) 
+; For example, if you need to show 4 elements (Timer, Crosshair, Voltage and Min Voltage) 
 ; then EQU will look like this: OSDdataLen	= 4 * 8
-.EQU	OSDdataLen	= 5 * 8	; 5 sections by 8 bytes each
+.EQU	OSDdataLen	= 4 * 8	; 4 sections by 8 bytes each
 
 ; *** OSD Elements
 ; Comment unneeded blocks
@@ -256,31 +253,31 @@ OSDdata:
 	.DB buff_name, 5		; buffer from where to print data, len of the printed text (6 for voltage)
 	.DB 0, 0				; dot position from right (0 for text), reserved
 	.DB 60, 1				; column to print and Symbol stretch (1 or 2)
-	.DW 40					; line to print
+	.DW 25					; line to print
 
 	; print timer
 	.DB buff_timer, 5		; buffer from where to print data, len of the printed text (6 for voltage)
 	.DB 3, 0				; dot position from right (0 for text), reserved
 	.DB 62, 1				; column to print and Symbol stretch (1 or 2)
-	.DW 55					; line to print
+	.DW 40					; line to print
 
 	; print crosshair
-	.DB buff_cross, 1		; buffer from where to print data, len of the printed text (6 for voltage)
-	.DB 0, 0				; dot position from right (0 for text), reserved
-	.DB 103, 1				; column to print and Symbol stretch (1 or 2)
-	.DW 155					; line to print
+;	.DB buff_cross, 1		; buffer from where to print data, len of the printed text (6 for voltage)
+;	.DB 0, 0				; dot position from right (0 for text), reserved
+;	.DB 103, 1				; column to print and Symbol stretch (1 or 2)
+;	.DW 135					; line to print
 
 	; print current voltage
 	.DB buff_cur_volt, 6	; buffer from where to print data, len of the printed text (6 for voltage)
 	.DB 2, 0				; dot position from right (0 for text), reserved
 	.DB 140, 2				; column to print and Symbol stretch (1 or 2)
-	.DW 240					; line to print
+	.DW 230					; line to print
 
 	; print min voltage
 	.DB buff_min_volt, 6	; buffer from where to print data, len of the printed text (6 for voltage)
 	.DB 2, 0				; dot position from right (0 for text), reserved
 	.DB 140, 1				; column to print and Symbol stretch (1 or 2)
-	.DW 270					; line to print
+	.DW 260					; line to print
 	
 
 ; *** PILOTNAME STRING

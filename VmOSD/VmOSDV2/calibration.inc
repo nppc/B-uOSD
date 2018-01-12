@@ -17,17 +17,6 @@ wt_calib:
 		breq wt_calib
 		; now lets see how much we got in timer0 counter
 		in tmp1, TCNT0
-
-		; store timer value to EEPROM for debugging
-		; Set Programming mode
-		ldi tmp, (0<<EEPM1)|(0<<EEPM0)
-		out EECR, tmp
-		; Set up address 
-		ldi tmp, 4
-		out EEARL, tmp
-		out EEDR,tmp1		; Write data
-		sbi EECR,EEMPE
-		sbi EECR,EEPE		
 		
 		; we need to convert this number to about 50us for a timer with prescaller 8 
 		; the formula is:
@@ -50,21 +39,6 @@ wt_calib_div:
 		cpc tmp2, z0
 		brsh wt_calib_div
 		; final value for OCR0A in tmp 
-
-		; store final value to EEPROM for debugging
-EEPROM_write:
-		; Wait for completion of previous write
-		sbic EECR,EEPE
-		rjmp EEPROM_write 
-		; Set Programming mode
-		ldi tmp1, (0<<EEPM1)|(0<<EEPM0)
-		out EECR, tmp1
-		; Set up address 
-		ldi tmp1, 5
-		out EEARL, tmp1
-		out EEDR,tmp		; Write data
-		sbi EECR,EEMPE
-		sbi EECR,EEPE		
 
 		sei
 		ret
