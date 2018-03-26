@@ -1,7 +1,7 @@
 #!/bin/sh
-cd ../VmOSD/VmOSDV2/
+cd ../VmOSD/VmOSD/
 avra main.asm
-mv main.hex ../../Bin/B-uOSD_v2.hex
+mv main.hex ../../Bin/B-uOSD_v1.hex
 rm main.cof
 rm main.eep.hex
 rm main.obj

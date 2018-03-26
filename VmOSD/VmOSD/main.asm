@@ -231,7 +231,7 @@ FPNB1:	lpm tmp1, Z+
 ;******* CONFIGURATION PART 2 *********		
 
 ; *** HOW many elements is showed on OSD. 
-; For example, if you need to show 4 elements (Timer, Crosshair, Voltage nd Min Voltage) 
+; For example, if you need to show 4 elements (Timer, Crosshair, Voltage and Min Voltage) 
 ; then EQU will look like this: OSDdataLen	= 4 * 8
 .EQU	OSDdataLen	= 5 * 8	; 5 sections by 8 bytes each
 
